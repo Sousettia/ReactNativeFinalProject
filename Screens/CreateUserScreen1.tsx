@@ -1,7 +1,14 @@
 import { StyleSheet, Text, View, Image, Pressable } from "react-native";
 import React, { useState } from "react";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 
-const CreateUserScreen1 = ({ navigation, route }: any): React.JSX.Element => {
+const CreateUserScreen1 = ({
+  navigation,
+  route,
+  onPress,
+}: any): React.JSX.Element => {
   const [modalVisible, setModalVisible] = useState(false);
 
   const goto1 = () => {
@@ -28,13 +35,10 @@ const CreateUserScreen1 = ({ navigation, route }: any): React.JSX.Element => {
     <View style={styles.container}>
       {/* รูปโลโก้ */}
       <Image
-        source={require("../Picture/Logo.jpg")}
+        source={require("../assets/Image/Logo.png")}
         resizeMode="contain"
         style={styles.myImage}
       />
-
-      {/* เว้นบรรทัด */}
-      <Text style={styles.Line}></Text>
 
       <Text style={styles.textTitle}>Create an Account</Text>
 
@@ -43,13 +47,18 @@ const CreateUserScreen1 = ({ navigation, route }: any): React.JSX.Element => {
 
       {/* Google Button */}
       <Pressable
-        style={[styles.button, styles.buttonOpen]}
-        onPress={() => {
-          setModalVisible(true);
-          goto1(); // เรียกใช้ฟังก์ชันการเปลี่ยนหน้าจอ
-        }}
+        style={[styles.button, styles.buttonOpen]} // Apply specific Google button styling
+        onPress={onPress}
       >
-        <Text style={styles.textStyle}>Continue with Google</Text>
+        <View style={styles.buttonContent}>
+          <AntDesign
+            name="google"
+            size={30}
+            color="#ffffff"
+            style={styles.icon}
+          />
+          <Text style={styles.textStyle}>Continue with Google</Text>
+        </View>
       </Pressable>
 
       {/* Facebook Button */}
@@ -60,7 +69,15 @@ const CreateUserScreen1 = ({ navigation, route }: any): React.JSX.Element => {
           goto2(); // เรียกใช้ฟังก์ชันการเปลี่ยนหน้าจอ
         }}
       >
-        <Text style={styles.textStyle}>Continue with Facebook</Text>
+        <View style={styles.buttonContent}>
+          <FontAwesome5
+            name="facebook"
+            size={30}
+            color="#ffffff"
+            style={styles.icon}
+          />
+          <Text style={styles.textStyle}>Continue with Facebook</Text>
+        </View>
       </Pressable>
 
       {/* X Button */}
@@ -71,7 +88,15 @@ const CreateUserScreen1 = ({ navigation, route }: any): React.JSX.Element => {
           goto3(); // เรียกใช้ฟังก์ชันการเปลี่ยนหน้าจอ
         }}
       >
-        <Text style={styles.textStyle}>Continue with X</Text>
+        <View style={styles.buttonContent}>
+          <FontAwesome6
+            name="x-twitter"
+            size={30}
+            color="#ffffff"
+            style={styles.icon}
+          />
+          <Text style={styles.textStyle}>Continue with X</Text>
+        </View>
       </Pressable>
 
       {/* Discord Button */}
@@ -82,7 +107,15 @@ const CreateUserScreen1 = ({ navigation, route }: any): React.JSX.Element => {
           goto4(); // เรียกใช้ฟังก์ชันการเปลี่ยนหน้าจอ
         }}
       >
-        <Text style={styles.textStyle}>Continue with Discord</Text>
+        <View style={styles.buttonContent}>
+          <FontAwesome6
+            name="discord"
+            size={30}
+            color="#ffffff"
+            style={styles.icon}
+          />
+          <Text style={styles.textStyle}>Continue with Discord</Text>
+        </View>
       </Pressable>
 
       {/* เว้นบรรทัด */}
@@ -107,9 +140,9 @@ export default CreateUserScreen1;
 const styles = StyleSheet.create({
   myImage: {
     width: "100%",
-    height: 250,
+    height: 225,
     marginTop: 100,
-    marginBottom: 20,
+    marginBottom: 50,
   },
   Line: {
     marginTop: 10,
@@ -121,7 +154,7 @@ const styles = StyleSheet.create({
     fontSize: 25,
   },
   button: {
-    borderRadius: 25,
+    borderRadius: 30,
     paddingVertical: 10, // ใช้ paddingVertical แทน padding เพื่อจัดตำแหน่งในแนวตั้ง
     paddingHorizontal: 20, // ใช้ paddingHorizontal เพื่อจัดตำแหน่งในแนวนอน
     elevation: 1,
@@ -133,7 +166,7 @@ const styles = StyleSheet.create({
   },
   buttonOpen: {
     borderColor: "#ffffff", // ขอบสีขาว
-    borderWidth: 2, // ความหนาของขอบ
+    borderWidth: 4, // ความหนาของขอบ
     backgroundColor: "#69aeb6",
   },
   textStyle: {
@@ -154,5 +187,14 @@ const styles = StyleSheet.create({
   },
   buttonOpenEmail: {
     backgroundColor: "#30777d",
+  },
+  icon: {
+    marginRight: 10,
+  },
+  buttonContent: {
+    flexDirection: "row", // Arrange items in a row
+    alignItems: "center", // Center items vertically
+    justifyContent: "flex-start", // Align content to the left
+    width: "100%", // Ensure button content takes full width
   },
 });

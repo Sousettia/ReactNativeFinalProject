@@ -4,7 +4,6 @@ import {
   View,
   Image,
   TextInput,
-  TouchableOpacity,
   Pressable,
 } from "react-native";
 import React, { useState } from 'react'
@@ -39,7 +38,7 @@ const CreateUserScreen2 = ({ navigation, route }: any) : React.JSX.Element => {
   return (
     <View style={styles.container}>
       <Image
-        source={require("../Picture/Logo.jpg")}
+        source={require("../assets/Image/Logo.png")}
         resizeMode="contain"
         style={styles.myImage}
       />
@@ -84,7 +83,7 @@ const CreateUserScreen2 = ({ navigation, route }: any) : React.JSX.Element => {
       {/* ยืนยันรหัสผ่าน*/}
       <TextInput
         style={styles.input}
-        value={password}
+        value={confirmPass}
         onChangeText={setConfirmPasss}
         placeholder="Confirm-Password"
       />
@@ -120,9 +119,9 @@ const styles = StyleSheet.create({
   },
   myImage: {
     width: "100%",
-    height: 250,
+    height: 225,
     marginTop: 100,
-    marginBottom: 20,
+    marginBottom: 50,
   },
   textTitle: {
     color: "#ffffff",
@@ -166,7 +165,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#a4e1e7",
     fontSize: 15,
     fontWeight: "bold",
-    borderColor: "#a4e1e7", // ขอบสีขาว
+    borderColor: "#a4e1e7",
     borderWidth: 2, // ความหนาของขอบ
   },
   textStyle: {

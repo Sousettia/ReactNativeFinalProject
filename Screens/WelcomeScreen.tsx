@@ -8,6 +8,9 @@ import {
   Modal,
   Button,
 } from "react-native";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 
 
 const WelcomeScreen = ({ navigation , route}: any): React.JSX.Element => {
@@ -28,11 +31,10 @@ const WelcomeScreen = ({ navigation , route}: any): React.JSX.Element => {
   return (
     <View style={styles.container}>
       <Image
-        source={require("../Picture/Logo.jpg")}
+        source={require("../assets/Image/Logo.png")}
         resizeMode="contain"
         style={styles.myImage}
       />
-      <Text style={styles.Line}></Text>
 
       {/* Acount Button */}
       <Pressable
@@ -62,9 +64,32 @@ const WelcomeScreen = ({ navigation , route}: any): React.JSX.Element => {
 
       <Text style={styles.text}>Begin with an existing account</Text>
 
-      <Text style={styles.Line}></Text>
-
-      <Text style={styles.text}>ใส่ icon ยังไงหว่า</Text>
+      <View style={styles.buttonContent}>
+      <AntDesign
+            name="google"
+            size={40}
+            color="#ffffff"
+            style={styles.icon}
+          />
+      <FontAwesome5
+            name="facebook"
+            size={40}
+            color="#ffffff"
+            style={styles.icon}
+          />
+      <FontAwesome6
+            name="x-twitter"
+            size={40}
+            color="#ffffff"
+            style={styles.icon}
+          />
+      <FontAwesome6
+            name="discord"
+            size={40}
+            color="#ffffff"
+            style={styles.icon}
+          />
+      </View>
 
     </View>
   );
@@ -75,12 +100,12 @@ export default WelcomeScreen;
 const styles = StyleSheet.create({
   myImage: {
     width: "100%",
-    height: 250,
-    marginTop: 100,
-    marginBottom: 20,
+    height: 225,
+    marginTop: 150,
+    marginBottom: 100,
   },
   Line: {
-    marginTop: 5,
+    marginTop: 15,
   },
   button: {
     borderRadius: 25,
@@ -121,5 +146,15 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     fontSize: 20,
+  },
+  buttonContent: {
+    flexDirection: "row", // Arrange items in a row
+    alignItems: "center", // Center items vertically
+    justifyContent: "center", // Center content horizontally
+    width: "100%", // Ensure button content takes full width
+    marginTop: 20,
+  },
+  icon: {
+    marginHorizontal: 15, // Provide horizontal spacing between icons
   },
 });
