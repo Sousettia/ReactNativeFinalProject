@@ -10,7 +10,7 @@ import React, { useState } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import Ionicons from '@expo/vector-icons/Ionicons';
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 const LogInScreen = ({
   navigation,
@@ -135,7 +135,12 @@ const LogInScreen = ({
 
       {/* Username Input */}
       <View style={styles.inputContainer}>
-        <FontAwesome5 name="user" size={20} color="#69aeb6" style={styles.inputIcon} />
+        <FontAwesome5
+          name="user"
+          size={20}
+          color="#69aeb6"
+          style={styles.inputIcon}
+        />
         <TextInput
           style={styles.input}
           value={username}
@@ -148,7 +153,12 @@ const LogInScreen = ({
 
       {/* Password Input */}
       <View style={styles.inputContainer}>
-        <Ionicons name="lock-closed-outline" size={20} color="#69aeb6" style={styles.inputIcon} />
+        <Ionicons
+          name="lock-closed-outline"
+          size={20}
+          color="#69aeb6"
+          style={styles.inputIcon}
+        />
         <TextInput
           style={styles.input}
           value={password}
@@ -223,9 +233,9 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   inputContainer: {
-    position: 'relative',
-    flexDirection: 'row',
-    alignItems: 'center',
+    position: "relative",
+    flexDirection: "row",
+    alignItems: "center",
     marginLeft: 50,
     marginRight: 50,
     borderRadius: 25,
@@ -243,7 +253,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   inputIcon: {
-    position: 'absolute',
+    position: "absolute",
     left: 10,
   },
   buttonLogin: {

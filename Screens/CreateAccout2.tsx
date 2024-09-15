@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import React, { useState } from 'react'
 
-const CreateUserScreen2 = ({ navigation, route }: any) : React.JSX.Element => {
+const CreateAccout2 = ({ navigation, route }: any) : React.JSX.Element => {
   const [name,setName] = useState("");
   const [email,setEmail] = useState("");
   const [password,setPassword] = useState(""); 
@@ -104,7 +104,7 @@ const CreateUserScreen2 = ({ navigation, route }: any) : React.JSX.Element => {
   )
 }
 
-export default CreateUserScreen2
+export default CreateAccout2
 
 const styles = StyleSheet.create({
   Line: {

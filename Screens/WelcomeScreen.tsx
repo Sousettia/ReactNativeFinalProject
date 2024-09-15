@@ -19,8 +19,8 @@ const WelcomeScreen = ({ navigation , route}: any): React.JSX.Element => {
   const [acountVisible, setAcountVisible] = useState(false);
   const [logInVisible, setLogInVisible] = useState(false);
 
-  const gotoAcount = () => {
-    navigation.navigate("Acount");
+  const gotoCreateAccout1 = () => {
+    navigation.navigate("CreateAccout1");
   };
 
   const gotoLogin = () => {
@@ -41,7 +41,7 @@ const WelcomeScreen = ({ navigation , route}: any): React.JSX.Element => {
         style={[styles.button, styles.buttonOpenAcount]}
         onPress={() => {
           setModalVisible(true);
-          gotoAcount(); // เรียกใช้ฟังก์ชันการเปลี่ยนหน้าจอ
+          gotoCreateAccout1(); // เรียกใช้ฟังก์ชันการเปลี่ยนหน้าจอ
         }}
       >
         <Text style={styles.textStyleAcount}>Create an Account</Text>
