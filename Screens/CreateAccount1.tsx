@@ -4,7 +4,7 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 
-const CreateAccout1 = ({
+const CreateAccount1 = ({
   navigation,
   route,
   onPress,
@@ -135,7 +135,7 @@ const CreateAccout1 = ({
   );
 };
 
-export default CreateAccout1;
+export default CreateAccount1;
 
 const styles = StyleSheet.create({
   myImage: {
