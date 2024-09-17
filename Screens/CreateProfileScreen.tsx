@@ -15,8 +15,8 @@ const CreateProfileScreen = ({ navigation, route }: any): React.JSX.Element => {
   const [age, setAge] = useState("");
   const [gender, setGender] = useState("");
 
-  const gotoHome = () => {
-    navigation.navigate("Home");
+  const gotoLogin = () => {
+    navigation.navigate("Login");
   };
 
   const handleGenderSelect = (selectedGender: string) => {
@@ -94,7 +94,7 @@ const CreateProfileScreen = ({ navigation, route }: any): React.JSX.Element => {
       <Pressable
         style={[styles.button, styles.buttonOpenConfirm]}
         onPress={() => {
-          gotoHome(); // เรียกใช้ฟังก์ชันการเปลี่ยนหน้าจอ
+          gotoLogin(); // เรียกใช้ฟังก์ชันการเปลี่ยนหน้าจอ
         }}
       >
         <Text style={styles.textStyle}>Confirm</Text>

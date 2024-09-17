@@ -146,6 +146,7 @@ const LogInScreen = ({
           value={username}
           onChangeText={setUsername}
           placeholder="Username"
+          
         />
       </View>
 
@@ -192,7 +193,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   Line2: {
-    marginTop: 2,
+    marginTop: 1,
   },
   textTitle: {
     color: "#ffffff",
@@ -202,7 +203,7 @@ const styles = StyleSheet.create({
   },
   button: {
     borderRadius: 30,
-    paddingVertical: 10, // ใช้ paddingVertical แทน padding เพื่อจัดตำแหน่งในแนวตั้ง
+    paddingVertical: 5, // ใช้ paddingVertical แทน padding เพื่อจัดตำแหน่งในแนวตั้ง
     paddingHorizontal: 20, // ใช้ paddingHorizontal เพื่อจัดตำแหน่งในแนวนอน
     elevation: 1,
     marginLeft: 50,
@@ -220,7 +221,7 @@ const styles = StyleSheet.create({
     color: "#ffffff",
     fontWeight: "bold",
     textAlign: "left",
-    fontSize: 20,
+    fontSize: 17,
   },
   container: {
     flex: 1, // ทำให้ View ขยายเต็มหน้าจอ
@@ -241,7 +242,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     backgroundColor: "#a4e1e7",
     borderColor: "#a4e1e7",
-    borderWidth: 2,
+    borderWidth: 0,
   },
   input: {
     flex: 1,

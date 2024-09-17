@@ -27,8 +27,8 @@ const CreateAccount1 = ({
     navigation.navigate("Discord");
   };
 
-  const goto5 = () => {
-    navigation.navigate("Email");
+  const gotoCreateAccount2 = () => {
+    navigation.navigate("CreateAccount2");
   };
 
   return (
@@ -48,7 +48,10 @@ const CreateAccount1 = ({
       {/* Google Button */}
       <Pressable
         style={[styles.button, styles.buttonOpen]} // Apply specific Google button styling
-        onPress={onPress}
+        onPress={() => {
+          setModalVisible(true);
+          goto1(); // เรียกใช้ฟังก์ชันการเปลี่ยนหน้าจอ
+        }}
       >
         <View style={styles.buttonContent}>
           <AntDesign
@@ -123,10 +126,10 @@ const CreateAccount1 = ({
 
       {/* E-mail Button */}
       <Pressable
-        style={[styles.button, styles.buttonOpenEmail]}
+        style={[styles.buttonEmail, styles.buttonOpenEmail]}
         onPress={() => {
           setModalVisible(true);
-          goto5(); // เรียกใช้ฟังก์ชันการเปลี่ยนหน้าจอ
+          gotoCreateAccount2(); // เรียกใช้ฟังก์ชันการเปลี่ยนหน้าจอ
         }}
       >
         <Text style={styles.textStyle}>Sign Up with E-mail address</Text>
@@ -155,7 +158,7 @@ const styles = StyleSheet.create({
   },
   button: {
     borderRadius: 30,
-    paddingVertical: 10, // ใช้ paddingVertical แทน padding เพื่อจัดตำแหน่งในแนวตั้ง
+    paddingVertical: 5, // ใช้ paddingVertical แทน padding เพื่อจัดตำแหน่งในแนวตั้ง
     paddingHorizontal: 20, // ใช้ paddingHorizontal เพื่อจัดตำแหน่งในแนวนอน
     elevation: 1,
     marginLeft: 50,
@@ -163,6 +166,16 @@ const styles = StyleSheet.create({
     marginTop: 10,
     alignItems: "center", // จัดตำแหน่งในแนวนอน
     justifyContent: "center", // จัดตำแหน่งในแนวตั้ง
+  },
+  buttonEmail: {
+    borderRadius: 25,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    elevation: 1,
+    marginLeft: 50,
+    marginRight: 50,
+    alignItems: "center",
+    justifyContent: "center",
   },
   buttonOpen: {
     borderColor: "#ffffff", // ขอบสีขาว
@@ -173,7 +186,7 @@ const styles = StyleSheet.create({
     color: "#ffffff",
     fontWeight: "bold",
     textAlign: "center",
-    fontSize: 20,
+    fontSize: 17,
   },
   container: {
     flex: 1, // ทำให้ View ขยายเต็มหน้าจอ
