@@ -14,8 +14,8 @@ const CreateAccount2 = ({ navigation, route }: any) : React.JSX.Element => {
   const [password,setPassword] = useState(""); 
   const [confirmPass,setConfirmPasss] = useState("");
   
-  const gotoCreateProfile = () => {
-    navigation.navigate("CreateProfile");
+  const gotoLogin = () => {
+    navigation.navigate("Login");
   };
 
   const validateInputs = () => {
@@ -94,7 +94,7 @@ const CreateAccount2 = ({ navigation, route }: any) : React.JSX.Element => {
       <Pressable
         style={[styles.button, styles.buttonOpenConfirm]}
         onPress={() => {
-          gotoCreateProfile(); // เรียกใช้ฟังก์ชันการเปลี่ยนหน้าจอ
+          gotoLogin(); // เรียกใช้ฟังก์ชันการเปลี่ยนหน้าจอ
         }}
       >
         <Text style={styles.textStyle}>Confirm</Text>

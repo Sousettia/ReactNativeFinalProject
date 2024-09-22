@@ -15,8 +15,8 @@ const CreateProfileScreen = ({ navigation, route }: any): React.JSX.Element => {
   const [age, setAge] = useState("");
   const [gender, setGender] = useState("");
 
-  const gotoLogin = () => {
-    navigation.navigate("Login");
+  const gotoHome = () => {
+    navigation.navigate("Home");
   };
 
   const handleGenderSelect = (selectedGender: string) => {
@@ -30,7 +30,7 @@ const CreateProfileScreen = ({ navigation, route }: any): React.JSX.Element => {
       <Text style={styles.TextCreate}>LET'S CREATE YOUR PROFILE</Text>
 
       <Image
-        source={require("../assets/Image/Logo.png")}
+        source={require("../assets/Image/CreateProfile.png")}
         resizeMode="contain"
         style={styles.myImage}
       />
@@ -94,7 +94,7 @@ const CreateProfileScreen = ({ navigation, route }: any): React.JSX.Element => {
       <Pressable
         style={[styles.button, styles.buttonOpenConfirm]}
         onPress={() => {
-          gotoLogin(); // เรียกใช้ฟังก์ชันการเปลี่ยนหน้าจอ
+          gotoHome(); // เรียกใช้ฟังก์ชันการเปลี่ยนหน้าจอ
         }}
       >
         <Text style={styles.textStyle}>Confirm</Text>
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
   },
   buttonOpenConfirm: {
     backgroundColor: "#30777d",
-    marginTop: 40,
+    marginTop: 25,
   },
   container: {
     flex: 1, // ทำให้ View ขยายเต็มหน้าจอ

@@ -44,6 +44,9 @@ const LogInScreen = ({
   const gotoHome = () => {
     navigation.navigate("Home");
   };
+  const gotoCreateProfile = () => {
+    navigation.navigate("CreateProfile");
+  };
 
   return (
     <View style={styles.container}>
@@ -129,7 +132,7 @@ const LogInScreen = ({
 
       <Text style={styles.Line2}></Text>
 
-      <Text style={styles.textTitle}>____________ OR ____________</Text>
+      <Text style={styles.textTitle}>________________ OR ________________</Text>
 
       <Text style={styles.Line2}></Text>
 
@@ -171,7 +174,7 @@ const LogInScreen = ({
       <Pressable
         style={[styles.buttonLogin, styles.buttonOpenLogin]}
         onPress={() => {
-          gotoHome(); // เรียกใช้ฟังก์ชันการเปลี่ยนหน้าจอ
+          gotoCreateProfile(); // เรียกใช้ฟังก์ชันการเปลี่ยนหน้าจอ
         }}
       >
         <Text style={styles.textStyle}>Login</Text>
@@ -193,13 +196,13 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   Line2: {
-    marginTop: 1,
+    marginTop: 0,
   },
   textTitle: {
     color: "#ffffff",
     fontWeight: "bold",
     textAlign: "center",
-    fontSize: 25,
+    fontSize: 20,
   },
   button: {
     borderRadius: 30,
@@ -208,7 +211,7 @@ const styles = StyleSheet.create({
     elevation: 1,
     marginLeft: 50,
     marginRight: 50,
-    marginTop: 10,
+    marginTop: 5,
     alignItems: "center", // จัดตำแหน่งในแนวนอน
     justifyContent: "center", // จัดตำแหน่งในแนวตั้ง
   },
@@ -269,7 +272,7 @@ const styles = StyleSheet.create({
   },
   buttonOpenLogin: {
     backgroundColor: "#30777d",
-    marginTop: 20,
+    marginTop: 15,
   },
   icon: {
     marginRight: 10,
