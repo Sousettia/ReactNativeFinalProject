@@ -57,52 +57,52 @@ function LoginStackScreen(){
 function HomeStackScreen(){
   return (
   <HomeStack.Navigator 
-    initialRouteName='Home'
+    initialRouteName='home'
     screenOptions={{
       headerTitleStyle:{fontWeight:'bold'},
       headerShown:false,
       }} 
     >  
-        <HomeStack.Screen name="Home" component={HomeScreen}/>
+        <HomeStack.Screen name="home" component={HomeScreen}/>
     </HomeStack.Navigator>
   )
 }
 function PlansStackScreen(){
   return (
   <HomeStack.Navigator 
-    initialRouteName='Plans'
+    initialRouteName='plans'
     screenOptions={{
       headerTitleStyle:{fontWeight:'bold'},
       headerShown:false,
       }} 
     >  
-        <HomeStack.Screen name="Plans" component={PlansScreen}/>
+        <HomeStack.Screen name="plans" component={PlansScreen}/>
     </HomeStack.Navigator>
   )
 }
 function ProfileStackScreen(){
   return (
   <HomeStack.Navigator 
-    initialRouteName='Profile'
+    initialRouteName='profile'
     screenOptions={{
       headerTitleStyle:{fontWeight:'bold'},
       headerShown:false,
       }} 
     >  
-        <HomeStack.Screen name="Profile" component={ProfileScreen}/>
+        <HomeStack.Screen name="profile" component={ProfileScreen}/>
     </HomeStack.Navigator>
   )
 }
 function NotificationsStackScreen(){
   return (
   <HomeStack.Navigator 
-    initialRouteName='Notifications'
+    initialRouteName='notifications'
     screenOptions={{
       headerTitleStyle:{fontWeight:'bold'},
       headerShown:false,
       }} 
     >  
-        <HomeStack.Screen name="Notifications" component={NotificationScreen}/>
+        <HomeStack.Screen name="notifications" component={NotificationScreen}/>
     </HomeStack.Navigator>
   )
 }

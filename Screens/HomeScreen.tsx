@@ -39,9 +39,10 @@ const HomeScreen = () => {
       />
         <Text style={styles.textTitle}>YOUR CREATE PLANS</Text>
       </View>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <ScrollView contentContainerStyle={styles.scrollContainer}
+      style ={styles.planContainer}>
         {plans.map((plan, index) => (
-          <View key={index} style={styles.planContainer}>
+          <View key={index} >
             <Text style={styles.planTitle}>{plan.title}</Text>
             <Text style={styles.planDetail}>Budget : {plan.budget}</Text>
             <Text style={styles.planDetail}>Date On Trip : {plan.date}</Text>
@@ -65,7 +66,6 @@ const styles = StyleSheet.create({
   },
   textTitle: {
     marginTop: 10,
-    marginBottom: 10,
     color: "#ffffff",
     fontWeight: "bold",
     textAlign: "center",
@@ -79,8 +79,6 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     paddingHorizontal: 20,
-  },
-  planContainer: {
     backgroundColor: '#A4E1E7',
     borderRadius: 10,
     padding: 15,
@@ -88,6 +86,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
       shadowRadius: 3.84,
       elevation: 5,
+  },
+  planContainer: {
+    backgroundColor: '#69aeb6',
+    borderRadius: 10,
+    padding: 15,
   },
   planTitle: {
     fontSize: 18,
