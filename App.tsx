@@ -15,6 +15,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Ionicons from "@expo/vector-icons/Ionicons";
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import CreatePlans from './Screens/CreatePlans';
 
 const HomeStack = createStackNavigator();
 const LoginStack = createNativeStackNavigator();
@@ -151,6 +152,24 @@ const App = () => {
             }
           }}
           component={PlansStackScreen} />
+          <Tab.Screen 
+          name="Create Plan" 
+          options={{
+            headerShown:false,
+            tabBarIcon:({color})=><FontAwesome
+            name="plus-circle"
+            size={30}
+            color={color}
+          />,
+            tabBarActiveTintColor: '#ddf3f5',
+            tabBarInactiveTintColor: '#69aeb6',
+            tabBarStyle: { 
+              backgroundColor: '#417F85', 
+              height: 60, 
+              paddingBottom: 3,
+            }
+          }}
+          component={CreatePlans} />
           <Tab.Screen 
           name="Profile" 
           options={{
