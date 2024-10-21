@@ -5,12 +5,14 @@ import {
   Image,
   Pressable,
   TextInput,
+  Alert,
 } from "react-native";
 import React, { useState } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import axios from "axios";
 
 const LogInScreen = ({
   navigation,
@@ -47,7 +49,38 @@ const LogInScreen = ({
   const gotoCreateProfile = () => {
     navigation.navigate("CreateProfile");
   };
+  const handleLogin = async () => {
+    // Basic validation
+    if (!username || !password) {
+      Alert.alert("Error", "Please fill in all fields.");
+      return;
+    }
 
+    try {
+      const response = await axios.post(
+        "http://192.168.1.241:5000/api/auth/login",
+        {
+          username: username,
+          password: password,
+        }
+      );
+
+      if (response.status === 200) {
+        Alert.alert("Success", "Logged in successfully!");
+        gotoCreateProfile();
+
+      } else {
+        Alert.alert("Error", "Failed to log in.");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      if (error.response && error.response.status === 400) {
+        Alert.alert("Error", "Invalid username or password.");
+      } else {
+        Alert.alert("Error", "An error occurred during login.");
+      }
+    }
+  };
   return (
     <View style={styles.container}>
       {/* รูปโลโก้ */}
@@ -149,7 +182,6 @@ const LogInScreen = ({
           value={username}
           onChangeText={setUsername}
           placeholder="Username"
-          
         />
       </View>
 
@@ -174,7 +206,7 @@ const LogInScreen = ({
       <Pressable
         style={[styles.buttonLogin, styles.buttonOpenLogin]}
         onPress={() => {
-          gotoCreateProfile(); // เรียกใช้ฟังก์ชันการเปลี่ยนหน้าจอ
+          handleLogin(); // เรียกใช้ฟังก์ชันการเปลี่ยนหน้าจอ
         }}
       >
         <Text style={styles.textStyle}>Login</Text>

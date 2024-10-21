@@ -5,34 +5,74 @@ import {
   Image,
   TextInput,
   Pressable,
+  Alert,
 } from "react-native";
-import React, { useState } from 'react'
+import React, { useState } from "react";
+import axios from "axios";
 
-const CreateAccount2 = ({ navigation, route }: any) : React.JSX.Element => {
-  const [name,setName] = useState("");
-  const [email,setEmail] = useState("");
-  const [password,setPassword] = useState(""); 
-  const [confirmPass,setConfirmPasss] = useState("");
-  
+const CreateAccount2 = ({ navigation, route }: any): React.JSX.Element => {
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPass, setConfirmPasss] = useState("");
+
   const gotoLogin = () => {
     navigation.navigate("Login");
   };
 
+  // Validate user inputs
   const validateInputs = () => {
-    // ตัวอย่างการตรวจสอบข้อมูล
-    if (!name || !email || !password || !confirmPass) {
-      alert("กรุณากรอกข้อมูลให้ครบทุกช่อง");
+    if (!username || !email || !password || !confirmPass) {
+      Alert.alert("Error", "Please fill in all the fields.");
       return false;
     }
 
-    // ตรวจสอบรูปแบบอีเมล
+    // Validate email format
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(email)) {
-      alert("รูปแบบอีเมลไม่ถูกต้อง");
+      Alert.alert("Error", "Invalid email format.");
+      return false;
+    }
+
+    // Check if passwords match
+    if (password !== confirmPass) {
+      Alert.alert("Error", "Passwords do not match.");
       return false;
     }
 
     return true;
+  };
+  // Handle user registration
+  const handleRegister = async () => {
+    if (!validateInputs()) return;
+    try {
+      const response = await axios.post(
+        "http://192.168.1.241:5000/api/auth/register",
+        {
+          username: username,
+          email: email,
+          password: password,
+        }
+      );
+
+      if (response.status === 200) {
+        Alert.alert("Success", "Account created successfully!");
+        gotoLogin(); // Navigate to login page
+      } else {
+        Alert.alert("Error", "Failed to create account.");
+      }
+    } catch (error) {
+      // Check if the error has a response and status code
+      if (error.response && error.response.status === 400) {
+        // Customize the error message based on your backend's response
+        Alert.alert(
+          "Error",
+          "User already exists. Please try a different username or email."
+        );
+      } else {
+        Alert.alert("Error", "An error occurred during registration.");
+      }
+    }
   };
 
   return (
@@ -48,22 +88,22 @@ const CreateAccount2 = ({ navigation, route }: any) : React.JSX.Element => {
       <Text style={styles.Line}></Text>
 
       {/* ผู้ใช้*/}
-      <TextInput 
-      style={styles.input} 
-      value={name} 
-      onChangeText={setName}
-      placeholder="Username"
+      <TextInput
+        style={styles.input}
+        value={username}
+        onChangeText={setUsername}
+        placeholder="Username"
       />
 
       {/* เว้นบรรทัด */}
       <Text style={styles.Line}></Text>
 
       {/* อีเมล*/}
-      <TextInput 
-      style={styles.input} 
-      value={email} 
-      onChangeText={setEmail} 
-      placeholder="E-mail"
+      <TextInput
+        style={styles.input}
+        value={email}
+        onChangeText={setEmail}
+        placeholder="E-mail"
       />
 
       {/* เว้นบรรทัด */}
@@ -94,17 +134,16 @@ const CreateAccount2 = ({ navigation, route }: any) : React.JSX.Element => {
       <Pressable
         style={[styles.button, styles.buttonOpenConfirm]}
         onPress={() => {
-          gotoLogin(); // เรียกใช้ฟังก์ชันการเปลี่ยนหน้าจอ
+          handleRegister();
         }}
       >
         <Text style={styles.textStyle}>Confirm</Text>
       </Pressable>
-
     </View>
-  )
-}
+  );
+};
 
-export default CreateAccount2
+export default CreateAccount2;
 
 const styles = StyleSheet.create({
   Line: {
@@ -175,4 +214,4 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 20,
   },
-})
+});

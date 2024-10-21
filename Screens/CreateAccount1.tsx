@@ -3,6 +3,23 @@ import React, { useState } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import axios from "axios";
+
+const register = async (username, email, password) => {
+  try {
+    const response = await axios.post('http://localhost:5000/api/auth/register', {
+      username,
+      email,
+      password,
+    });
+    const { token } = response.data;
+    console.log('Registration successful, token:', token);
+    // Store token and navigate to Home
+  } catch (error) {
+    console.error('Registration failed:', error.response?.data?.msg || error.message);
+  }
+};
+
 
 const CreateAccount1 = ({
   navigation,
