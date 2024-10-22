@@ -15,11 +15,87 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import CreatePlans from "./Screens/CreatePlans";
+import CreatePlansScreen from "./Screens/CreatePlansScreen";
 
 const HomeStack = createStackNavigator();
+const PlansStack = createStackNavigator();
+const ProfileStack = createStackNavigator();
+const CreatePlansStack = createStackNavigator();
+const NotificationsStack = createStackNavigator();
 const LoginStack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator();
+
 const Tab = createBottomTabNavigator();
+
+function TabContainer(){
+  return(
+    <Tab.Navigator 
+      screenOptions={({route})=> ({
+        headerShown: false,
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName = "";
+        if (route.name === "HomeStack"){
+          iconName = focused
+            ? "home"
+            : "home-outline";
+        }else if (route.name === "PlansStack"){
+          iconName = focused 
+            ? "people" 
+            : "people-outline";
+        }else if (route.name === "CreatePlansStack"){
+          iconName = focused 
+            ? "add-circle" 
+            : "add-circle-outline";
+        }else if (route.name === "ProfileStack"){
+          iconName = focused 
+            ? "person" 
+            : "person-outline";
+        }else if (route.name === "NotificationsStack"){
+          iconName = focused 
+            ? "notifications" 
+            : "notifications-outline";
+        }
+        return <Ionicons name={iconName} size={size} color={color}/>;
+        },
+        tabBarActiveTintColor: "#ddf3f5",
+              tabBarInactiveTintColor: "#69aeb6",
+              tabBarStyle: {
+                backgroundColor: "#417F85",
+                height: 60,
+                paddingBottom: 3,
+              },
+      })}>
+      <Tab.Screen 
+        name="HomeStack"
+        component={HomeStackScreen}
+        options={{tabBarLabel:'Home'}}
+      />
+      <Tab.Screen 
+        name="PlansStack"
+        component={PlansStackScreen}
+        options={{tabBarLabel:'Plans'}}
+      />
+      <Tab.Screen 
+        name="CreatePlansStack"
+        component={CreatePlansStackScreen}
+        options={{tabBarLabel:'CreatePlans'}}
+      />
+      <Tab.Screen 
+        name="ProfileStack"
+        component={ProfileStackScreen}
+        options={{tabBarLabel:'Profile'}}
+      />
+      <Tab.Screen 
+        name="NotificationsStack"
+        component={NotificationsStackScreen}
+        options={{tabBarLabel:'Notifications'}}
+      />
+      
+    </Tab.Navigator>
+  )
+}
+
+
 
 function LoginStackScreen() {
   return (
@@ -57,41 +133,57 @@ function HomeStackScreen() {
 }
 function PlansStackScreen() {
   return (
-    <HomeStack.Navigator
-      initialRouteName="plans"
+    <PlansStack.Navigator
+      initialRouteName="Plans" 
       screenOptions={{
         headerTitleStyle: { fontWeight: "bold" },
         headerShown: false,
       }}
     >
-      <HomeStack.Screen name="plans" component={PlansScreen} />
-    </HomeStack.Navigator>
+      <PlansStack.Screen name="Plans" component={PlansScreen} />  
+    </PlansStack.Navigator>
   );
 }
+
+function CreatePlansStackScreen() {
+  return (
+    <CreatePlansStack.Navigator
+      initialRouteName="CreatePlans" 
+      screenOptions={{
+        headerTitleStyle: { fontWeight: "bold" },
+        headerShown: false,
+      }}
+    >
+      <CreatePlansStack.Screen name="CreatePlans" component={CreatePlansScreen} />  
+    </CreatePlansStack.Navigator>
+  );
+}
+
 function ProfileStackScreen() {
   return (
-    <HomeStack.Navigator
-      initialRouteName="profile"
+    <ProfileStack.Navigator
+      initialRouteName="Profile"  
       screenOptions={{
         headerTitleStyle: { fontWeight: "bold" },
         headerShown: false,
       }}
     >
-      <HomeStack.Screen name="profile" component={ProfileScreen} />
-    </HomeStack.Navigator>
+      <ProfileStack.Screen name="Profile" component={ProfileScreen} />  
+    </ProfileStack.Navigator>
   );
 }
+
 function NotificationsStackScreen() {
   return (
-    <HomeStack.Navigator
-      initialRouteName="notifications"
+    <NotificationsStack.Navigator
+      initialRouteName="Notifications"  
       screenOptions={{
         headerTitleStyle: { fontWeight: "bold" },
         headerShown: false,
       }}
     >
-      <HomeStack.Screen name="notifications" component={NotificationScreen} />
-    </HomeStack.Navigator>
+      <NotificationsStack.Screen name="Notifications" component={NotificationScreen} />  
+    </NotificationsStack.Navigator>
   );
 }
 
@@ -100,94 +192,8 @@ const App = () => {
 
   return (
     <NavigationContainer>
-      {!isCreate ? (
-        <Tab.Navigator screenOptions={{ headerShown: false }}>
-          <Tab.Screen
-            name="Home"
-            options={{
-              headerShown: false,
-              tabBarIcon: ({ color }) => (
-                <Ionicons name="home" size={30} color={color} />
-              ),
-              tabBarActiveTintColor: "#ddf3f5",
-              tabBarInactiveTintColor: "#69aeb6",
-              tabBarStyle: {
-                backgroundColor: "#417F85",
-                height: 60,
-                paddingBottom: 3,
-              },
-            }}
-            component={HomeStackScreen}
-          />
-          <Tab.Screen
-            name="Plans"
-            options={{
-              headerShown: false,
-              tabBarIcon: ({ color }) => (
-                <FontAwesome5 name="user-friends" size={30} color={color} />
-              ),
-              tabBarActiveTintColor: "#ddf3f5",
-              tabBarInactiveTintColor: "#69aeb6",
-              tabBarStyle: {
-                backgroundColor: "#417F85",
-                height: 60,
-                paddingBottom: 3,
-              },
-            }}
-            component={PlansStackScreen}
-          />
-          <Tab.Screen
-            name="Create Plan"
-            options={{
-              headerShown: false,
-              tabBarIcon: ({ color }) => (
-                <FontAwesome name="plus-circle" size={30} color={color} />
-              ),
-              tabBarActiveTintColor: "#ddf3f5",
-              tabBarInactiveTintColor: "#69aeb6",
-              tabBarStyle: {
-                backgroundColor: "#417F85",
-                height: 60,
-                paddingBottom: 3,
-              },
-            }}
-            component={CreatePlans}
-          />
-          <Tab.Screen
-            name="Profile"
-            options={{
-              headerShown: false,
-              tabBarIcon: ({ color }) => (
-                <FontAwesome name="user" size={30} color={color} />
-              ),
-              tabBarActiveTintColor: "#ddf3f5",
-              tabBarInactiveTintColor: "#69aeb6",
-              tabBarStyle: {
-                backgroundColor: "#417F85",
-                height: 60,
-                paddingBottom: 3,
-              },
-            }}
-            component={ProfileStackScreen}
-          />
-          <Tab.Screen
-            name="Notifications"
-            options={{
-              headerShown: false,
-              tabBarIcon: ({ color }) => (
-                <Ionicons name="notifications" size={30} color={color} />
-              ),
-              tabBarActiveTintColor: "#ddf3f5",
-              tabBarInactiveTintColor: "#69aeb6",
-              tabBarStyle: {
-                backgroundColor: "#417F85",
-                height: 60,
-                paddingBottom: 3,
-              },
-            }}
-            component={NotificationsStackScreen}
-          />
-        </Tab.Navigator>
+      {isCreate ? (
+        <Stack.Screen name="Home" component={TabContainer} />
       ) : (
         <LoginStackScreen />
       )}

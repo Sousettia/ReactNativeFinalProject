@@ -43,7 +43,7 @@ const LogInScreen = ({
     navigation.navigate("Email");
   };
 
-  const gotoHome = () => {
+  const gotoMainHome = () => {
     navigation.navigate("Home");
   };
   const gotoCreateProfile = () => {
@@ -206,7 +206,7 @@ const LogInScreen = ({
       <Pressable
         style={[styles.buttonLogin, styles.buttonOpenLogin]}
         onPress={() => {
-          handleLogin(); // เรียกใช้ฟังก์ชันการเปลี่ยนหน้าจอ
+          gotoMainHome(); // เรียกใช้ฟังก์ชันการเปลี่ยนหน้าจอ
         }}
       >
         <Text style={styles.textStyle}>Login</Text>

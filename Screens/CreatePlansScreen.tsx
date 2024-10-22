@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
-const CreatePlans = () => {
+const CreatePlansScreen = () => {
     const [description, setDescription] = useState("");
 
   return (
@@ -107,4 +107,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CreatePlans;
+export default CreatePlansScreen;
