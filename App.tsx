@@ -12,9 +12,7 @@ import ProfileScreen from "./Screens/ProfileScreen";
 import NotificationScreen from "./Screens/NotificationScreen";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { Ionicons } from "@expo/vector-icons";
 import CreatePlansScreen from "./Screens/CreatePlansScreen";
 
 const HomeStack = createStackNavigator();
@@ -27,75 +25,64 @@ const Stack = createNativeStackNavigator();
 
 const Tab = createBottomTabNavigator();
 
-function TabContainer(){
-  return(
-    <Tab.Navigator 
-      screenOptions={({route})=> ({
+function TabContainer() {
+  return (
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
         headerShown: false,
         tabBarIcon: ({ focused, color, size }) => {
-          let iconName = "";
-        if (route.name === "HomeStack"){
-          iconName = focused
-            ? "home"
-            : "home-outline";
-        }else if (route.name === "PlansStack"){
-          iconName = focused 
-            ? "people" 
-            : "people-outline";
-        }else if (route.name === "CreatePlansStack"){
-          iconName = focused 
-            ? "add-circle" 
-            : "add-circle-outline";
-        }else if (route.name === "ProfileStack"){
-          iconName = focused 
-            ? "person" 
-            : "person-outline";
-        }else if (route.name === "NotificationsStack"){
-          iconName = focused 
-            ? "notifications" 
-            : "notifications-outline";
-        }
-        return <Ionicons name={iconName} size={size} color={color}/>;
+          let iconName: keyof typeof Ionicons.glyphMap;
+
+          if (route.name === "HomeStack") {
+            iconName = focused ? "home" : "home-outline";
+          } else if (route.name === "PlansStack") {
+            iconName = focused ? "people" : "people-outline";
+          } else if (route.name === "CreatePlansStack") {
+            iconName = focused ? "add-circle" : "add-circle-outline";
+          } else if (route.name === "ProfileStack") {
+            iconName = focused ? "person" : "person-outline";
+          } else if (route.name === "NotificationsStack") {
+            iconName = focused ? "notifications" : "notifications-outline";
+          }
+          return <Ionicons name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: "#ddf3f5",
-              tabBarInactiveTintColor: "#69aeb6",
-              tabBarStyle: {
-                backgroundColor: "#417F85",
-                height: 60,
-                paddingBottom: 3,
-              },
-      })}>
-      <Tab.Screen 
+        tabBarInactiveTintColor: "#69aeb6",
+        tabBarStyle: {
+          backgroundColor: "#417F85",
+          height: 60,
+          paddingBottom: 3,
+        },
+      })}
+    >
+      <Tab.Screen
         name="HomeStack"
         component={HomeStackScreen}
-        options={{tabBarLabel:'Home'}}
+        options={{ tabBarLabel: "Home" }}
       />
-      <Tab.Screen 
+      <Tab.Screen
         name="PlansStack"
         component={PlansStackScreen}
-        options={{tabBarLabel:'Plans'}}
+        options={{ tabBarLabel: "Plans" }}
       />
-      <Tab.Screen 
+      <Tab.Screen
         name="CreatePlansStack"
         component={CreatePlansStackScreen}
-        options={{tabBarLabel:'CreatePlans'}}
+        options={{ tabBarLabel: "CreatePlans" }}
       />
-      <Tab.Screen 
+      <Tab.Screen
         name="ProfileStack"
         component={ProfileStackScreen}
-        options={{tabBarLabel:'Profile'}}
+        options={{ tabBarLabel: "Profile" }}
       />
-      <Tab.Screen 
+      <Tab.Screen
         name="NotificationsStack"
         component={NotificationsStackScreen}
-        options={{tabBarLabel:'Notifications'}}
+        options={{ tabBarLabel: "Notifications" }}
       />
-      
     </Tab.Navigator>
-  )
+  );
 }
-
-
 
 function LoginStackScreen() {
   return (
@@ -134,13 +121,13 @@ function HomeStackScreen() {
 function PlansStackScreen() {
   return (
     <PlansStack.Navigator
-      initialRouteName="Plans" 
+      initialRouteName="Plans"
       screenOptions={{
         headerTitleStyle: { fontWeight: "bold" },
         headerShown: false,
       }}
     >
-      <PlansStack.Screen name="Plans" component={PlansScreen} />  
+      <PlansStack.Screen name="Plans" component={PlansScreen} />
     </PlansStack.Navigator>
   );
 }
@@ -148,13 +135,16 @@ function PlansStackScreen() {
 function CreatePlansStackScreen() {
   return (
     <CreatePlansStack.Navigator
-      initialRouteName="CreatePlans" 
+      initialRouteName="CreatePlans"
       screenOptions={{
         headerTitleStyle: { fontWeight: "bold" },
         headerShown: false,
       }}
     >
-      <CreatePlansStack.Screen name="CreatePlans" component={CreatePlansScreen} />  
+      <CreatePlansStack.Screen
+        name="CreatePlans"
+        component={CreatePlansScreen}
+      />
     </CreatePlansStack.Navigator>
   );
 }
@@ -162,13 +152,13 @@ function CreatePlansStackScreen() {
 function ProfileStackScreen() {
   return (
     <ProfileStack.Navigator
-      initialRouteName="Profile"  
+      initialRouteName="Profile"
       screenOptions={{
         headerTitleStyle: { fontWeight: "bold" },
         headerShown: false,
       }}
     >
-      <ProfileStack.Screen name="Profile" component={ProfileScreen} />  
+      <ProfileStack.Screen name="Profile" component={ProfileScreen} />
     </ProfileStack.Navigator>
   );
 }
@@ -176,13 +166,16 @@ function ProfileStackScreen() {
 function NotificationsStackScreen() {
   return (
     <NotificationsStack.Navigator
-      initialRouteName="Notifications"  
+      initialRouteName="Notifications"
       screenOptions={{
         headerTitleStyle: { fontWeight: "bold" },
         headerShown: false,
       }}
     >
-      <NotificationsStack.Screen name="Notifications" component={NotificationScreen} />  
+      <NotificationsStack.Screen
+        name="Notifications"
+        component={NotificationScreen}
+      />
     </NotificationsStack.Navigator>
   );
 }
