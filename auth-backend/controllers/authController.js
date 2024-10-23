@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 
 // Register User
 exports.registerUser = async (req, res) => {
-  const { username, email, password } = req.body;
+  const { username, email, password, nickname, DoB, gender } = req.body;
 
   try {
     // Check if user already exists
@@ -13,8 +13,8 @@ exports.registerUser = async (req, res) => {
       return res.status(400).json({ msg: "User already exists" });
     }
 
-    // Create new user
-    user = new User({ username, email, password });
+    // Create new user with additional fields
+    user = new User({ username, email, password, nickname, DoB, gender });
     await user.save();
 
     // Generate JWT
@@ -28,6 +28,7 @@ exports.registerUser = async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 };
+
 
 // Login User
 exports.loginUser = async (req, res) => {
@@ -43,7 +44,7 @@ exports.loginUser = async (req, res) => {
     // Compare password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ msg: "Invalid credentials Password" });
+      return res.status(401).json({ msg: "Invalid credentials Password" });
     }
 
     // Generate JWT

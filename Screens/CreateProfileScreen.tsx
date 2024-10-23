@@ -5,35 +5,118 @@ import {
   Image,
   TextInput,
   Pressable,
+  Alert,
+  Platform,
 } from "react-native";
 import React, { useState } from "react";
-import icons from 'react-native-vector-icons'
+import * as ImagePicker from "expo-image-picker"; // Import Image Picker
+import axios from "axios";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 const CreateProfileScreen = ({ navigation, route }: any): React.JSX.Element => {
+  const { username, email, password } = route.params;
   const [nickname, setNickname] = useState("");
-  const [status, setStatus] = useState("");
-  const [age, setAge] = useState("");
+  const [DoB, setDoB] = useState<Date | null>(null); // Initialize DoB as null
   const [gender, setGender] = useState("");
+  const [selectedImage, setSelectedImage] = useState<string | null>(null); // State for the selected image
+  const [showDatePicker, setShowDatePicker] = useState(false); // Toggle for date pick
 
-  const gotoHome = () => {
-    navigation.navigate("Home");
+  // Function to handle image picking
+  const pickImage = async () => {
+    // Ask for permission to access the media library
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      Alert.alert("Sorry, we need camera roll permissions to make this work!");
+      return;
+    }
+
+    // Open the image picker
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images, // Only images
+      allowsEditing: true, // Allow user to edit the image (crop)
+      aspect: [4, 3], // Aspect ratio for cropping (optional)
+      quality: 1, // Image quality (1 means highest)
+    });
+
+    if (!result.canceled) {
+      setSelectedImage(result.assets[0].uri); // Set the image URI if the user picks an image
+    }
   };
 
   const handleGenderSelect = (selectedGender: string) => {
     setGender(selectedGender);
   };
 
+  // Handle Date Picker change
+  const handleDateChange = (event: any, selectedDate?: Date) => {
+    if (selectedDate) {
+      setDoB(selectedDate); // Set the selected date
+    }
+    setShowDatePicker(false); // Hide the picker after selection
+  };
+  const handleRegister = async () => {
+    try {
+      const response = await axios.post(
+        "http://192.168.1.192:5000/api/auth/register",
+        {
+          username,
+          email,
+          password,
+          nickname,
+          DoB:DoB?.toISOString().split("T")[0], // Format DoB to YYYY-MM-DD
+          gender,
+        }
+      );
+      if (response.status === 200) {
+        Alert.alert("Success", "Account created successfully!");
+        console.log("Navigating to Login Screen...");
+        navigation.navigate("Login")
+      } else {
+        Alert.alert("Error", "Failed to create account.");
+      }
+    } catch (error: any) {
+      if (axios.isAxiosError(error)) {
+        console.log("Full Axios error object:", error);
+        console.log("Axios error response:", error.response?.data);
+        console.log("Axios error status:", error.response?.status);
+  
+        if (error.response && error.response.status === 400) {
+          Alert.alert(
+            "Error",
+            "User already exists. Please try a different username or email."
+          );
+        } else {
+          Alert.alert(
+            "Error",
+            `An error occurred during registration: ${
+              error.response?.data || error.message
+            }`
+          );
+        }
+      } else {
+        console.log("Unexpected error:", error);
+        Alert.alert("Error", "An unexpected error occurred.");
+      }
+    }
+  };
   return (
     <View style={styles.container}>
       <Text style={styles.textTitle}>SKY SWAN</Text>
       <Text style={styles.TextWelcome}>WELCOME!!!</Text>
       <Text style={styles.TextCreate}>LET'S CREATE YOUR PROFILE</Text>
 
-      <Image
-        source={require("../assets/Image/CreateProfile.png")}
-        resizeMode="contain"
-        style={styles.myImage}
-      />
+      {/* Image that can be clicked to pick an image */}
+      <Pressable onPress={pickImage} style={styles.imageContainer}>
+        <Image
+          source={
+            selectedImage
+              ? { uri: selectedImage } // Display the selected image
+              : require("../assets/Image/CreateProfile.png") // Default image
+          }
+          style={styles.imageFrame}
+          resizeMode="cover" // Use 'cover' to fill the frame, or 'contain' to fit inside
+        />
+      </Pressable>
 
       <TextInput
         style={styles.input}
@@ -41,13 +124,25 @@ const CreateProfileScreen = ({ navigation, route }: any): React.JSX.Element => {
         onChangeText={setNickname}
         placeholder=" NICKNAME"
       />
+      {/* Date of Birth Picker */}
+      <Pressable style={styles.input} onPress={() => setShowDatePicker(true)}>
+      <Text
+          style={DoB ? styles.selectedDate : styles.placeholder}
+        >
+          {DoB ? DoB.toDateString() : "SELECT DATE OF BIRTH"}
+        </Text>
+      </Pressable>
 
-      <TextInput
-        style={styles.input}
-        value={status}
-        onChangeText={setStatus}
-        placeholder=" STATUS"
-      />
+      {/* Show DateTimePicker when required */}
+      {showDatePicker && (
+        <DateTimePicker
+          value={DoB || new Date()} // Show current date if no date is selected
+          mode="date"
+          display="default"
+          maximumDate={new Date()} // Ensuring DoB can't be in the future
+          onChange={handleDateChange}
+        />
+      )}
 
       <View style={styles.genderContainer}>
         <Pressable
@@ -84,17 +179,10 @@ const CreateProfileScreen = ({ navigation, route }: any): React.JSX.Element => {
         <Text style={styles.genderText}>Other</Text> */}
       </View>
 
-      <TextInput
-        style={styles.input}
-        value={age}
-        onChangeText={setAge}
-        placeholder=" AGE"
-      />
-
       <Pressable
         style={[styles.button, styles.buttonOpenConfirm]}
         onPress={() => {
-          gotoHome(); // เรียกใช้ฟังก์ชันการเปลี่ยนหน้าจอ
+          handleRegister(); // เรียกใช้ฟังก์ชันการเปลี่ยนหน้าจอ
         }}
       >
         <Text style={styles.textStyle}>Confirm</Text>
@@ -164,7 +252,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#69aeb6",
   },
   input: {
-    color: "#69aeb6",
+    color: "#000000",
     height: 40,
     borderRadius: 25,
     marginLeft: 50,
@@ -186,9 +274,9 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   genderContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center', // To space out buttons evenly
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center", // To space out buttons evenly
     marginTop: 20,
     marginBottom: 10,
   },
@@ -216,5 +304,35 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     marginHorizontal: 10, // Added margin to space out text from buttons
+  },
+  imageContainer: {
+    alignSelf: "center",
+    width: 150, // Set a fixed width for the frame
+    height: 150, // Set a fixed height for the frame
+    borderRadius: 75, // Rounded frame (optional)
+    overflow: "hidden", // Ensure the image doesn't go outside the frame
+    marginTop: 20,
+  },
+  imageFrame: {
+    width: "100%",
+    height: "100%",
+  },
+  placeholder: {
+    position: "absolute", // Position the placeholder in the input field
+    left: 15, // Adjust to where you want the placeholder to appear
+    top: "25%", // Vertically center the text
+    color: "#4d4a4a", // Placeholder color (similar to system color)
+    fontSize: 15, // Font size of the placeholder
+    fontWeight: "bold",
+    zIndex: 1, // Ensure the placeholder is above the TextInput
+  },
+  selectedDate:{
+    position: "absolute", // Position the placeholder in the input field
+    left: 15, // Adjust to where you want the placeholder to appear
+    top: "25%", // Vertically center the text
+    color: "#000000", // Placeholder color (similar to system color)
+    fontSize: 15, // Font size of the placeholder
+    fontWeight: "bold",
+    zIndex: 1, // Ensure the placeholder is above the TextInput
   },
 });

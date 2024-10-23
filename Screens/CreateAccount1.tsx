@@ -5,44 +5,10 @@ import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import axios from "axios";
 
-const register = async (username, email, password) => {
-  try {
-    const response = await axios.post('http://localhost:5000/api/auth/register', {
-      username,
-      email,
-      password,
-    });
-    const { token } = response.data;
-    console.log('Registration successful, token:', token);
-    // Store token and navigate to Home
-  } catch (error) {
-    console.error('Registration failed:', error.response?.data?.msg || error.message);
-  }
-};
-
-
 const CreateAccount1 = ({
   navigation,
-  route,
-  onPress,
 }: any): React.JSX.Element => {
   const [modalVisible, setModalVisible] = useState(false);
-
-  const goto1 = () => {
-    navigation.navigate("Google");
-  };
-
-  const goto2 = () => {
-    navigation.navigate("Facebook");
-  };
-
-  const goto3 = () => {
-    navigation.navigate("X");
-  };
-
-  const goto4 = () => {
-    navigation.navigate("Discord");
-  };
 
   const gotoCreateAccount2 = () => {
     navigation.navigate("CreateAccount2");
@@ -67,7 +33,6 @@ const CreateAccount1 = ({
         style={[styles.button, styles.buttonOpen]} // Apply specific Google button styling
         onPress={() => {
           setModalVisible(true);
-          goto1(); // เรียกใช้ฟังก์ชันการเปลี่ยนหน้าจอ
         }}
       >
         <View style={styles.buttonContent}>
@@ -86,7 +51,6 @@ const CreateAccount1 = ({
         style={[styles.button, styles.buttonOpen]}
         onPress={() => {
           setModalVisible(true);
-          goto2(); // เรียกใช้ฟังก์ชันการเปลี่ยนหน้าจอ
         }}
       >
         <View style={styles.buttonContent}>
@@ -105,7 +69,6 @@ const CreateAccount1 = ({
         style={[styles.button, styles.buttonOpen]}
         onPress={() => {
           setModalVisible(true);
-          goto3(); // เรียกใช้ฟังก์ชันการเปลี่ยนหน้าจอ
         }}
       >
         <View style={styles.buttonContent}>
@@ -124,7 +87,6 @@ const CreateAccount1 = ({
         style={[styles.button, styles.buttonOpen]}
         onPress={() => {
           setModalVisible(true);
-          goto4(); // เรียกใช้ฟังก์ชันการเปลี่ยนหน้าจอ
         }}
       >
         <View style={styles.buttonContent}>

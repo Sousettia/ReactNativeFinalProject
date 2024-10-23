@@ -7,12 +7,13 @@ import {
   TextInput,
   Alert,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import axios from "axios";
+import { AuthContext } from "../auth-backend/context/AuthContext";
 
 const LogInScreen = ({
   navigation,
@@ -20,35 +21,10 @@ const LogInScreen = ({
   onPress,
 }: any): React.JSX.Element => {
   const [modalVisible, setModalVisible] = useState(false);
+  //const { login } = useContext(AuthContext); // Use login function from context
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const goto1 = () => {
-    navigation.navigate("Google");
-  };
-
-  const goto2 = () => {
-    navigation.navigate("Facebook");
-  };
-
-  const goto3 = () => {
-    navigation.navigate("X");
-  };
-
-  const goto4 = () => {
-    navigation.navigate("Discord");
-  };
-
-  const goto5 = () => {
-    navigation.navigate("Email");
-  };
-
-  const gotoMainHome = () => {
-    navigation.navigate("Home");
-  };
-  const gotoCreateProfile = () => {
-    navigation.navigate("CreateProfile");
-  };
   const handleLogin = async () => {
     // Basic validation
     if (!username || !password) {
@@ -58,7 +34,7 @@ const LogInScreen = ({
 
     try {
       const response = await axios.post(
-        "http://192.168.1.241:5000/api/auth/login",
+        "http://192.168.1.192:5000/api/auth/login",
         {
           username: username,
           password: password,
@@ -67,12 +43,12 @@ const LogInScreen = ({
 
       if (response.status === 200) {
         Alert.alert("Success", "Logged in successfully!");
-        gotoCreateProfile();
-
+        //login(response.data); // Use login function from context to set auth state
+        navigation.navigate("Home"); // Navigate to the HomeStack
       } else {
         Alert.alert("Error", "Failed to log in.");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login error:", error);
       if (error.response && error.response.status === 400) {
         Alert.alert("Error", "Invalid username or password.");
@@ -111,7 +87,6 @@ const LogInScreen = ({
         style={[styles.button, styles.buttonOpen]}
         onPress={() => {
           setModalVisible(true);
-          goto2(); // เรียกใช้ฟังก์ชันการเปลี่ยนหน้าจอ
         }}
       >
         <View style={styles.buttonContent}>
@@ -130,7 +105,6 @@ const LogInScreen = ({
         style={[styles.button, styles.buttonOpen]}
         onPress={() => {
           setModalVisible(true);
-          goto3(); // เรียกใช้ฟังก์ชันการเปลี่ยนหน้าจอ
         }}
       >
         <View style={styles.buttonContent}>
@@ -149,7 +123,6 @@ const LogInScreen = ({
         style={[styles.button, styles.buttonOpen]}
         onPress={() => {
           setModalVisible(true);
-          goto4(); // เรียกใช้ฟังก์ชันการเปลี่ยนหน้าจอ
         }}
       >
         <View style={styles.buttonContent}>
@@ -206,7 +179,7 @@ const LogInScreen = ({
       <Pressable
         style={[styles.buttonLogin, styles.buttonOpenLogin]}
         onPress={() => {
-          gotoMainHome(); // เรียกใช้ฟังก์ชันการเปลี่ยนหน้าจอ
+          handleLogin();
         }}
       >
         <Text style={styles.textStyle}>Login</Text>

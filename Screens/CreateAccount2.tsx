@@ -16,8 +16,12 @@ const CreateAccount2 = ({ navigation, route }: any): React.JSX.Element => {
   const [password, setPassword] = useState("");
   const [confirmPass, setConfirmPasss] = useState("");
 
-  const gotoLogin = () => {
-    navigation.navigate("Login");
+  const gotoCreateProfile = () => {
+    navigation.navigate("CreateProfile", {
+      username,
+      email,
+      password,
+    });
   };
 
   // Validate user inputs
@@ -45,34 +49,8 @@ const CreateAccount2 = ({ navigation, route }: any): React.JSX.Element => {
   // Handle user registration
   const handleRegister = async () => {
     if (!validateInputs()) return;
-    try {
-      const response = await axios.post(
-        "http://192.168.1.241:5000/api/auth/register",
-        {
-          username: username,
-          email: email,
-          password: password,
-        }
-      );
-
-      if (response.status === 200) {
-        Alert.alert("Success", "Account created successfully!");
-        gotoLogin(); // Navigate to login page
-      } else {
-        Alert.alert("Error", "Failed to create account.");
-      }
-    } catch (error) {
-      // Check if the error has a response and status code
-      if (error.response && error.response.status === 400) {
-        // Customize the error message based on your backend's response
-        Alert.alert(
-          "Error",
-          "User already exists. Please try a different username or email."
-        );
-      } else {
-        Alert.alert("Error", "An error occurred during registration.");
-      }
-    }
+    // If validation passes, navigate to CreateProfileScreen
+    gotoCreateProfile();
   };
 
   return (
@@ -195,7 +173,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#69aeb6",
   },
   input: {
-    color: "#69aeb6",
+    color: "#000000",
     height: 40,
     borderRadius: 25,
     marginLeft: 50,
