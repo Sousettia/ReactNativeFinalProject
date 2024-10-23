@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
 
 const NotificationScreen = () => {
   const [isEnabled, setIsEnabled] = useState(false);
@@ -39,7 +39,8 @@ const NotificationScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}
+    showsVerticalScrollIndicator={false}>
       <Text style={styles.textTitle}>NOTIFICATION</Text>
       <View style={styles.viewSetUp}>
         <Text style={styles.textSetUp}>Allow The Notification</Text>
@@ -104,7 +105,7 @@ const NotificationScreen = () => {
           </TouchableOpacity>
         </View>
       ))}
-    </View>
+    </ScrollView>
   );
 };
 

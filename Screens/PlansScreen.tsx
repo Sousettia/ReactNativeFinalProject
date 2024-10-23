@@ -5,37 +5,80 @@ import {
     Image,
     SafeAreaView,
     ScrollView,
+    FlatList,
+    Touchable,
   } from "react-native";
 import React from 'react'
+import { TouchableOpacity } from "react-native-gesture-handler";
 
-const plans = [
-    { title: 'Camp Trip', budget: '3,000 baht', date: '8/16/2028' },
-    { title: 'Sea Trip', budget: '2,000 baht', date: '10/25/2026' },
-    { title: 'Chang rai Trip', budget: '8,000 baht', date: '10/25/2026' },
-    { title: 'Chang rai Trip', budget: '8,000 baht', date: '10/25/2026' },
-    { title: 'Chang rai Trip', budget: '8,000 baht', date: '10/25/2026' },
-    { title: 'Chang rai Trip', budget: '8,000 baht', date: '10/25/2026' },
-    { title: 'Chang rai Trip', budget: '8,000 baht', date: '10/25/2026' },
-    { title: 'Chang rai Trip', budget: '8,000 baht', date: '10/25/2026' },
-    { title: 'Chang rai Trip', budget: '8,000 baht', date: '10/25/2026' },
-  ];
+interface PlansItem {
+  id: string;
+  title: string;
+  budget: string;
+  date: string;
+}
+
+type RenderItemProps = { item: PlansItem };
 
 const PlansScreen = () => {
+  const plans: PlansItem[] = [
+    { id: "1", title: 'Camp Trip', budget: '3,000 baht', date: '8/16/2028' },
+    { id: "2", title: 'Sea Trip', budget: '2,000 baht', date: '10/25/2026' },
+    { id: "3", title: 'Chang rai Trip', budget: '8,000 baht', date: '10/25/2026' },
+    { id: "4", title: 'Chang rai Trip', budget: '8,000 baht', date: '10/25/2026' },
+    { id: "5", title: 'Chang rai Trip', budget: '8,000 baht', date: '10/25/2026' },
+    { id: "6", title: 'Chang rai Trip', budget: '8,000 baht', date: '10/25/2026' },
+    { id: "7", title: 'Chang rai Trip', budget: '8,000 baht', date: '10/25/2026' },
+    { id: "8", title: 'Chang rai Trip', budget: '8,000 baht', date: '10/25/2026' },
+    { id: "9", title: 'Chang rai Trip', budget: '8,000 baht', date: '10/25/2026' },
+  ];
+  
+
+  //ฟังก์ชัน _renderItem
+  const _renderItem = ({ item }: RenderItemProps) => (
+    <TouchableOpacity style={styles.planContainer}>
+      <Text style={styles.planTitle}>{item.title}</Text>
+      <Text style={styles.planDetail}>{item.budget}</Text>
+      <Text style={styles.planDetail}>{item.date}</Text>
+    </TouchableOpacity>
+  );
+  const __renderItem = ({ item }: RenderItemProps) => (
+    <TouchableOpacity style={styles.invitedPlanContainer}>
+      <Text style={styles.planTitle}>{item.title}</Text>
+      <Text style={styles.planDetail}>{item.budget}</Text>
+      <Text style={styles.planDetail}>{item.date}</Text>
+    </TouchableOpacity>
+  );
     return (
-        <SafeAreaView style={styles.container}>
-          <View style={styles.header}> 
+        <ScrollView style={styles.container}
+        showsVerticalScrollIndicator={false}>
             <Text style={styles.textTitle}>PLANS</Text>
-          </View>
-          <ScrollView contentContainerStyle={styles.scrollContainer}>
-            {plans.map((plan, index) => (
-              <View key={index} style={styles.planContainer}>
-                <Text style={styles.planTitle}>{plan.title}</Text>
-                <Text style={styles.planDetail}>Budget : {plan.budget}</Text>
-                <Text style={styles.planDetail}>Date On Trip : {plan.date}</Text>
+          <View>
+            <FlatList
+                data={plans} 
+                renderItem={_renderItem} 
+                showsVerticalScrollIndicator={false}
+                keyExtractor={(item) => item.id} 
+                scrollEnabled={false}
+            ListHeaderComponentStyle ={{ marginVertical: 10}}
+            ListHeaderComponent={() => (
+              <View>
+                <FlatList
+                horizontal={true}
+                data={plans} 
+                renderItem={__renderItem}
+                contentContainerStyle={{ gap: 10, paddingHorizontal:12}} 
+                showsHorizontalScrollIndicator={false}
+                keyExtractor={(item) => item.id}
+                
+                />
+                <Text style={styles.textTitle}>YOUR CREATE PLANS</Text>
               </View>
-            ))}
-          </ScrollView>
-        </SafeAreaView>
+            )}
+            />
+            
+          </View>
+        </ScrollView>
       );
 }
 
@@ -51,7 +94,6 @@ const styles = StyleSheet.create({
     },
     textTitle: {
       marginTop: 50,
-      marginBottom: 10,
       color: "#ffffff",
       fontWeight: "bold",
       textAlign: "left",
@@ -63,17 +105,28 @@ const styles = StyleSheet.create({
       marginTop: 10,
       marginBottom: 10,
     },
-    scrollContainer: {
-      paddingHorizontal: 20,
-    },
     planContainer: {
+      marginHorizontal: 16,
+      marginVertical: 8,
+      paddingHorizontal: 20,
       backgroundColor: '#A4E1E7',
-      borderRadius: 10,
+      borderRadius: 20,
       padding: 15,
-      marginBottom: 15,
       shadowOpacity: 0.25,
         shadowRadius: 3.84,
         elevation: 5,
+    },
+    invitedPlanContainer: {
+      width : 200,
+      height : 140,
+      display: "flex",
+      justifyContent: "center",
+      marginHorizontal: 5,
+      paddingHorizontal: 12,
+      backgroundColor: '#A4E1E7',
+      borderRadius: 20,
+      padding: 15,
+      
     },
     planTitle: {
       fontSize: 18,

@@ -1,110 +1,240 @@
-import React, { useState } from "react";
 import {
-  View,
-  Text,
   StyleSheet,
-  TouchableOpacity,
+  Text,
+  View,
+  Image,
   TextInput,
-  Button,
+  Pressable,
+  Modal,
+  Touchable,
+  TouchableOpacity,
 } from "react-native";
-import Icon from 'react-native-vector-icons/FontAwesome5';
+import React, { useState } from "react";
+import icons from "react-native-vector-icons";
+import { ScrollView } from "react-native-gesture-handler";
+import Createplans from "../components/Createplans";
+import Planid from "../components/Planid";
 
-const CreatePlansScreen = () => {
-    const [description, setDescription] = useState("");
+const CreatePlansScreen = ({ navigation, route }: any): React.JSX.Element => {
+  const [planName, setPlanName] = useState("");
+  const [budget, setBudget] = useState("");
+  const [dateOnTrip, setDateOnTrip] = useState("");
+  const [description, setDescription] = useState("");
+  const [planId, setPlanId] = useState("");
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [selectedButton, setSelectedButton] = useState("");
+
+  const toggleModal = (plan: string) => {
+    setSelectedButton(plan);
+    setModalVisible(true);
+  };
+
+  const renderComponent = () => {
+    if (selectedButton === "London") {
+      return <Createplans/>;
+    } else if (selectedButton === "Bangkok") {
+      return <Planid/>;
+    }
+    return null;
+  };
+  const gotoHome = () => {
+    navigation.navigate("Home");
+  };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.box}>
-        <Text style={styles.textTitle}>CAMP TRIP</Text>
-        <View style={styles.budgetContainer}>
-           <Text style={styles.text}>BUDGET: 3,000 baht</Text> 
-           <Icon name="pen" size={20} color="#ffffff" style={styles.icon} />
-        </View>
-        <View style={styles.budgetContainer}>
-           <Text style={styles.text}>Date on trip: 8/16/2028</Text> 
-           <Icon name="pen" size={20} color="#ffffff" style={styles.icon} />
-        </View>
-        <View style={styles.budgetContainer}>
-           <Text style={styles.text}>Create Date: 9/20/2027</Text> 
-           <Icon name="pen" size={20} color="#ffffff" style={styles.icon} />
-        </View>
-        <View style={styles.budgetContainer}>
-           <Text style={styles.text}>MEMBER: John,Jane,June,Jim</Text> 
-           <Icon name="pen" size={20} color="#ffffff" style={styles.icon} />
-        </View>
-        <Text style={styles.text}>Description:</Text>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.description}
-            value={description}
-            onChangeText={setDescription}
-            multiline
-            numberOfLines={4}
-          />
-          <Icon name="pen" size={20} color="#30777d" style={styles.inputIcon} />
-        </View>
-      </View>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <Text style={styles.textTitle}>CREATE PLANS</Text>
+      <Image
+        source={require("../assets/Image/CreateProfile.png")}
+        resizeMode="contain"
+        style={styles.myImage}
+      />
+      <Text style={styles.textStyle}>Plan Name</Text>
+      <TextInput
+        style={styles.input}
+        value={planName}
+        onChangeText={setPlanName}
+      />
+      <Text style={styles.textStyle}>Budget</Text>
+      <TextInput style={styles.input} value={budget} onChangeText={setBudget} />
+      <Text style={styles.textStyle}>Date On Trip</Text>
+      <TextInput
+        style={styles.input}
+        value={dateOnTrip}
+        onChangeText={setDateOnTrip}
+        placeholder=" MM/DD/YYYY"
+      />
+
+      <Text style={styles.textStyle}>Description</Text>
+      <TextInput
+        style={styles.description}
+        multiline
+        numberOfLines={7}
+        value={description}
+        onChangeText={setDescription}
+      />
+
+      <TouchableOpacity 
+        style={styles.button} 
+        onPress={() => {setModalVisible(true), toggleModal("London")}}>
+        <Text style={styles.textButton}>Create Plan</Text>
+      </TouchableOpacity>
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={isModalVisible}
+        onRequestClose={() => {
+          setModalVisible(!setModalVisible);
+        }}
+        
+      >
+        <View style={styles.modalView}>
+          {renderComponent()}
+          <View style={styles.buttomView}>
+          <TouchableOpacity
+            style={styles.touchableOpacityCancel}
+            onPress={() => setModalVisible(false)}
+          >
+            <Text style={styles.textButton}>Cancel</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.touchableOpacityConfirm}
+            onPress={() => setModalVisible(false)}
+          >
+            <Text style={styles.textButton}>Confirm</Text>
+          </TouchableOpacity>
+          </View>
     </View>
+      </Modal>
+      <Text style={styles.textStyle}>Plan ID</Text>
+      <TextInput style={styles.input} value={planId} onChangeText={setPlanId} />
+      <TouchableOpacity 
+          style={styles.button} 
+          onPress={() => {setModalVisible(true), toggleModal("Bangkok")}}>
+          <Text style={styles.textButton}>Confirm</Text>
+      </TouchableOpacity>
+    </ScrollView>
   );
 };
 
+export default CreatePlansScreen;
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#69aeb6",
-    padding: 20,
+  modalView: {
+    margin: 30,
+    backgroundColor: "white",
+    borderRadius: 20,
+    paddingTop: 30,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    justifyContent: 'center',
+    marginTop:370,
   },
-  box: {
-    marginTop: 50,
-    marginLeft: 10,
-    width: 350,
-    height: 700,
-    backgroundColor: "#30777d",
+  modalText: {
     borderRadius: 25,
-    borderColor: "black",
-    borderWidth: 2,
+    fontWeight: "bold",
+    marginBottom: 15,
+    fontSize: 18,
+    textAlign: 'center',
+  },
+  closeButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 30,
+    marginTop: 20,
+    alignItems:'center'
+  },
+  myImage: {
+    width: "100%",
+    height: 120,
+    marginTop: 40,
+    marginBottom: 35,
   },
   textTitle: {
-    marginTop: 30,
+    marginTop: 50,
     marginBottom: 10,
-    marginLeft: 25,
     color: "#ffffff",
     fontWeight: "bold",
-    textAlign: "left",
+    textAlign: "center",
     fontSize: 35,
   },
-  text: {
-    marginTop: 10,
-    marginBottom: 10,
-    marginLeft: 10,
+  textStyle: {
+    borderRadius: 25,
     color: "#ffffff",
     fontWeight: "bold",
     textAlign: "left",
+    fontSize: 18,
+    marginLeft: 20,
+  },
+  textButton: {
+    borderRadius: 20,
+    color: "#ffffff",
+    fontWeight: "bold",
+    textAlign: "center",
     fontSize: 20,
   },
-  description: {
-    marginTop: 20,
-    marginLeft: 20,
-    width: 305,
-    height: 320,
-    backgroundColor: "#a4e1e7",
-    borderRadius: 25,
+  buttomView:{
+    width: '100%',
+    flexDirection: 'row'
   },
-  icon: {
-    marginLeft: 10,
-  },
-  budgetContainer: {
-    flexDirection: 'row',
+  touchableOpacityCancel:{
+    flex:1,
+    paddingVertical:10,
     alignItems: 'center',
+    backgroundColor: "#c0c0c0",
+    borderBottomLeftRadius: 20,
   },
-  inputContainer: {
-    position: 'relative',
+  touchableOpacityConfirm:{
+    flex:1,
+    paddingVertical:10,
+    alignItems: 'center',
+    backgroundColor: "#69aeb6",
+    borderBottomRightRadius: 20,
   },
-  inputIcon: {
-    position: 'absolute',
-    right: 30,
-    bottom: 10,
+  button: {
+    borderRadius: 25,
+    paddingVertical: 3,
+    paddingHorizontal: 23,
+    elevation: 1,
+    marginLeft: 110,
+    marginRight: 110,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#30777d",
+    marginBottom: 10,
+  },
+  container: {
+    flex: 1, // ทำให้ View ขยายเต็มหน้าจอ
+    backgroundColor: "#69aeb6",
+  },
+  description: {
+    marginTop: 10,
+    marginLeft: 20,
+    marginRight: 20,
+    backgroundColor: "#a4e1e7",
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 15,
+    fontSize: 16,
+    height: 125,
+  },
+  input: {
+    color: "black",
+    height: 40,
+    borderRadius: 25,
+    marginLeft: 20,
+    marginRight: 20,
+    marginTop: 10,
+    marginBottom: 10,
+    paddingHorizontal: 15,
+    backgroundColor: "#a4e1e7",
+    fontSize: 15,
+    fontWeight: "bold",
   },
 });
-
-export default CreatePlansScreen;

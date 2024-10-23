@@ -5,6 +5,7 @@ import {
   Image,
   TextInput,
   Pressable,
+  ScrollView,
 } from "react-native";
 import React, { useState } from "react";
 import icons from 'react-native-vector-icons'
@@ -25,7 +26,8 @@ const ProfileScreen = ({ navigation, route }: any): React.JSX.Element => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}
+    showsVerticalScrollIndicator={false}>
       <Text style={styles.textTitle}>PROFILE</Text>
       <Image
         source={require("../assets/Image/CreateProfile.png")}
@@ -109,7 +111,7 @@ const ProfileScreen = ({ navigation, route }: any): React.JSX.Element => {
       >
         <Text style={styles.textLogout}>Log out</Text>
       </Pressable>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -177,7 +179,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   input: {
-    color: "#69aeb6",
+    color: "black",
     height: 40,
     borderRadius: 25,
     marginLeft: 20,

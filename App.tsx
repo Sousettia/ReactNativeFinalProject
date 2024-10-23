@@ -21,8 +21,6 @@ const ProfileStack = createStackNavigator();
 const CreatePlansStack = createStackNavigator();
 const NotificationsStack = createStackNavigator();
 const LoginStack = createNativeStackNavigator();
-const Stack = createNativeStackNavigator();
-
 const Tab = createBottomTabNavigator();
 
 function TabContainer() {
@@ -34,15 +32,21 @@ function TabContainer() {
           let iconName: keyof typeof Ionicons.glyphMap;
 
           if (route.name === "HomeStack") {
-            iconName = focused ? "home" : "home-outline";
+            iconName = focused ? "home" : "home-outline"
+            size = 30;
           } else if (route.name === "PlansStack") {
-            iconName = focused ? "people" : "people-outline";
+            iconName = focused ? "people" : "people-outline"
+            size = 30;
           } else if (route.name === "CreatePlansStack") {
-            iconName = focused ? "add-circle" : "add-circle-outline";
+            iconName = focused ? "add-circle" : "add-circle-outline"
+            size = 40;
+            color = "white";
           } else if (route.name === "ProfileStack") {
-            iconName = focused ? "person" : "person-outline";
+            iconName = focused ? "person" : "person-outline"
+            size = 30;
           } else if (route.name === "NotificationsStack") {
-            iconName = focused ? "notifications" : "notifications-outline";
+            iconName = focused ? "notifications" : "notifications-outline"
+            size = 30;
           }
           return <Ionicons name={iconName} size={size} color={color} />;
         },
@@ -68,7 +72,7 @@ function TabContainer() {
       <Tab.Screen
         name="CreatePlansStack"
         component={CreatePlansStackScreen}
-        options={{ tabBarLabel: "CreatePlans" }}
+        options={{ tabBarLabel: "" }}
       />
       <Tab.Screen
         name="ProfileStack"
@@ -185,8 +189,8 @@ const App = () => {
 
   return (
     <NavigationContainer>
-      {isCreate ? (
-        <Stack.Screen name="Home" component={TabContainer} />
+      {!isCreate ? (
+        <TabContainer />
       ) : (
         <LoginStackScreen />
       )}

@@ -29,7 +29,8 @@ const plans = [
 const HomeScreen = () => {
   
   return (
-    <SafeAreaView style={styles.container}>
+    <ScrollView style={styles.container}
+    showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
         {/* รูปโลโก้ */}
         <Image
@@ -37,7 +38,7 @@ const HomeScreen = () => {
         resizeMode="cover"
         style={styles.myImage}
       />
-        <Text style={styles.textTitle}>YOUR CREATE PLANS</Text>
+        <Text style={styles.textTitle}>UPCOMING PLANS</Text>
       </View>
       <ScrollView contentContainerStyle={styles.scrollContainer}
       style ={styles.planContainer}>
@@ -49,7 +50,7 @@ const HomeScreen = () => {
           </View>
         ))}
       </ScrollView>
-    </SafeAreaView>
+    </ScrollView>
   );
 };
 
@@ -68,7 +69,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     color: "#ffffff",
     fontWeight: "bold",
-    textAlign: "center",
+    textAlign: "left",
     fontSize: 35,
   },
   myImage: {
