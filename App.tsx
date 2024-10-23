@@ -10,6 +10,7 @@ import HomeScreen from "./Screens/HomeScreen";
 import PlansScreen from "./Screens/PlansScreen";
 import ProfileScreen from "./Screens/ProfileScreen";
 import NotificationScreen from "./Screens/NotificationScreen";
+import { AuthContext, AuthProvider } from "./auth-backend/context/AuthContext";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Ionicons } from "@expo/vector-icons";
@@ -29,7 +30,7 @@ function TabContainer() {
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarIcon: ({ focused, color, size }) => {
-          let iconName: keyof typeof Ionicons.glyphMap;
+          let iconName: keyof typeof Ionicons.glyphMap = "home";
 
           if (route.name === "HomeStack") {
             iconName = focused ? "home" : "home-outline"
@@ -185,17 +186,22 @@ function NotificationsStackScreen() {
 }
 
 const App = () => {
-  const [isCreate] = useState(false);
-
   return (
     <NavigationContainer>
-      {!isCreate ? (
-        <TabContainer />
-      ) : (
-        <LoginStackScreen />
-      )}
+      <LoginStackScreen />
     </NavigationContainer>
   );
+  /*
+  <AuthProvider>
+      <NavigationContainer>
+        <AuthContext.Consumer>
+          {({ isAuthenticated }) => (
+            isAuthenticated ? <TabContainer /> : <LoginStackScreen />
+          )}
+        </AuthContext.Consumer>
+      </NavigationContainer>
+    </AuthProvider>
+  */
 };
 
 export default App;
