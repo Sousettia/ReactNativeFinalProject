@@ -8,7 +8,7 @@ const UserSchema = new mongoose.Schema({
   nickname: { type: String },
   DoB: { type: Date },
   gender: { type: String },
-});
+},{ timestamps: true });
 
 // Hash password before saving user
 UserSchema.pre('save', async function (next) {

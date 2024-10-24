@@ -8,26 +8,24 @@ import {
   ScrollView,
 } from "react-native";
 import React, { useState } from "react";
-import icons from 'react-native-vector-icons'
-
+import icons from "react-native-vector-icons";
+import { logout } from "../auth-backend/services/auth-service";
+import { useAppDispatch, useAppSelector } from "../auth-backend/redux-toolkit/hooks";
+import { selectAuthState, setIsLogin } from "../auth-backend/auth/auth-slice";
 const ProfileScreen = ({ navigation, route }: any): React.JSX.Element => {
   const [nickname, setNickname] = useState("");
   const [status, setStatus] = useState("");
   const [age, setAge] = useState("");
   const [gender, setGender] = useState("");
   const [uid, setUid] = useState("");
-
-  const gotoHome = () => {
-    navigation.navigate("Home");
-  };
-
-  const handleGenderSelect = (selectedGender: string) => {
-    setGender(selectedGender);
-  };
+  
+  const dispatch = useAppDispatch();
+  const { isLogin } = useAppSelector(selectAuthState);
+  const { profile } = useAppSelector(selectAuthState);
 
   return (
-    <ScrollView style={styles.container}
-    showsVerticalScrollIndicator={false}>
+    
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <Text style={styles.textTitle}>PROFILE</Text>
       <Image
         source={require("../assets/Image/CreateProfile.png")}
@@ -37,60 +35,24 @@ const ProfileScreen = ({ navigation, route }: any): React.JSX.Element => {
       <Text style={styles.textStyle}>Nickname</Text>
       <TextInput
         style={styles.input}
-        value={nickname}
-        onChangeText={setNickname}
+        value={profile?.nickname || ""} // Display nickname from profile
+        editable={false} // Make it non-editable if needed
         placeholder=" NICKNAME"
       />
-      <Text style={styles.textStyle}>Status</Text>
+      <Text style={styles.textStyle}>Gender</Text>
       <TextInput
         style={styles.input}
-        value={status}
-        onChangeText={setStatus}
-        placeholder=" STATUS"
+        value={profile?.gender || ""}
+        editable={false} // Make it non-editable if needed
+        placeholder=" GENDER"
       />
-      <Text style={styles.textStyle}>Gender</Text>
-
-      <View style={styles.genderContainer}>
-        <Pressable
-          style={[
-            styles.radioButton,
-            gender === "Male" && styles.selectedRadioButton,
-          ]}
-          onPress={() => handleGenderSelect("Male")}
-        >
-          {gender === "Male" && <View style={styles.radioButtonInner} />}
-        </Pressable>
-        <Text style={styles.genderText}>Male</Text>
-
-        <Pressable
-          style={[
-            styles.radioButton,
-            gender === "Female" && styles.selectedRadioButton,
-          ]}
-          onPress={() => handleGenderSelect("Female")}
-        >
-          {gender === "Female" && <View style={styles.radioButtonInner} />}
-        </Pressable>
-        <Text style={styles.genderText}>Female</Text>
-
-        {/* <Pressable
-          style={[
-            styles.radioButton,
-            gender === "Other" && styles.selectedRadioButton,
-          ]}
-          onPress={() => handleGenderSelect("Other")}
-        >
-          {gender === "Other" && <View style={styles.radioButtonInner} />}
-        </Pressable>
-        <Text style={styles.genderText}>Other</Text> */}
-      </View>
 
       <Text style={styles.textStyle}>Age</Text>
 
       <TextInput
         style={styles.input}
-        value={age}
-        onChangeText={setAge}
+        value={profile?.DoB ? calculateAge(new Date(profile.DoB)) : ""}
+        editable={false} // Make it non-editable if needed
         placeholder=" AGE"
       />
 
@@ -98,15 +60,17 @@ const ProfileScreen = ({ navigation, route }: any): React.JSX.Element => {
 
       <TextInput
         style={styles.input}
-        value={uid}
-        onChangeText={setUid}
+        value={profile?._id || ""} // Display User-ID from profile
+        editable={false} // Make it non-editable
         placeholder=" USER-ID"
       />
 
       <Pressable
         style={[styles.button, styles.buttonLogout]}
-        onPress={() => {
-          gotoHome(); // เรียกใช้ฟังก์ชันการเปลี่ยนหน้าจอ
+        onPress={async () => {
+          await logout();
+          dispatch(setIsLogin(false));
+          console.log("Logout",isLogin) //true
         }}
       >
         <Text style={styles.textLogout}>Log out</Text>
@@ -116,6 +80,13 @@ const ProfileScreen = ({ navigation, route }: any): React.JSX.Element => {
 };
 
 export default ProfileScreen;
+
+// Helper function to calculate age from date of birth
+const calculateAge = (dob: Date) => {
+  const diff = Date.now() - dob.getTime();
+  const ageDate = new Date(diff);
+  return Math.abs(ageDate.getUTCFullYear() - 1970).toString(); // Convert to string for TextInput
+};
 
 const styles = StyleSheet.create({
   Line: {
@@ -194,9 +165,9 @@ const styles = StyleSheet.create({
     borderWidth: 2, // ความหนาของขอบ
   },
   genderContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center', // To space out buttons evenly
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center", // To space out buttons evenly
     marginTop: 20,
     marginBottom: 10,
   },

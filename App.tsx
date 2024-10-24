@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, useFocusEffect } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import WelcomeScreen from "./Screens/WelcomeScreen";
 import LogInScreen from "./Screens/LogInScreen";
@@ -10,11 +10,25 @@ import HomeScreen from "./Screens/HomeScreen";
 import PlansScreen from "./Screens/PlansScreen";
 import ProfileScreen from "./Screens/ProfileScreen";
 import NotificationScreen from "./Screens/NotificationScreen";
-import { AuthContext, AuthProvider } from "./auth-backend/context/AuthContext";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Ionicons } from "@expo/vector-icons";
 import CreatePlansScreen from "./Screens/CreatePlansScreen";
+import { Provider } from "react-redux";
+import { store } from "./auth-backend/redux-toolkit/store";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import {
+  useAppDispatch,
+  useAppSelector,
+} from "./auth-backend/redux-toolkit/hooks";
+import {
+  selectAuthState,
+  setIsLoading,
+  setIsLogin,
+  setProfile,
+} from "./auth-backend/auth/auth-slice";
+import { ActivityIndicator, View } from "react-native";
+import { getProfile } from "./auth-backend/services/auth-service";
 
 const HomeStack = createStackNavigator();
 const PlansStack = createStackNavigator();
@@ -33,20 +47,20 @@ function TabContainer() {
           let iconName: keyof typeof Ionicons.glyphMap = "home";
 
           if (route.name === "HomeStack") {
-            iconName = focused ? "home" : "home-outline"
+            iconName = focused ? "home" : "home-outline";
             size = 30;
           } else if (route.name === "PlansStack") {
-            iconName = focused ? "people" : "people-outline"
+            iconName = focused ? "people" : "people-outline";
             size = 30;
           } else if (route.name === "CreatePlansStack") {
-            iconName = focused ? "add-circle" : "add-circle-outline"
+            iconName = focused ? "add-circle" : "add-circle-outline";
             size = 40;
             color = "white";
           } else if (route.name === "ProfileStack") {
-            iconName = focused ? "person" : "person-outline"
+            iconName = focused ? "person" : "person-outline";
             size = 30;
           } else if (route.name === "NotificationsStack") {
-            iconName = focused ? "notifications" : "notifications-outline"
+            iconName = focused ? "notifications" : "notifications-outline";
             size = 30;
           }
           return <Ionicons name={iconName} size={size} color={color} />;
@@ -186,13 +200,61 @@ function NotificationsStackScreen() {
   );
 }
 
-const App = () => {
-  return (
-    <NavigationContainer>
-      <LoginStackScreen />
-    </NavigationContainer>
+const App = (): React.JSX.Element => {
+  const { isLogin, isLoading } = useAppSelector(selectAuthState);
+  const dispatch = useAppDispatch();
+  const checkLogin = async () => {
+    try {
+      dispatch(setIsLoading(true));
+      const response = await getProfile();
+
+      if (response?.data) {
+        dispatch(setProfile(response.data));
+        console.log(response.data);
+        dispatch(setIsLogin(true));
+      } else {
+        //ไมไ่ด้ Login ให้กลับไปที่หน้า LoginScreen
+        dispatch(setIsLogin(false));
+        console.log("here");
+      }
+    } catch (error) {
+      console.log("check login catch", isLogin);
+      console.log(error);
+    } finally {
+      dispatch(setIsLoading(false));
+    }
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      checkLogin();
+    }, [])
   );
-  /*
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="blue" />
+      </View>
+    );
+  }
+
+  return isLogin ? <TabContainer /> : <LoginStackScreen />; //return App
+};
+const AppWrapper = () => {
+  return (
+    <Provider store={store}>
+      <SafeAreaProvider>
+        <NavigationContainer>
+          <App />
+        </NavigationContainer>
+      </SafeAreaProvider>
+    </Provider>
+  );
+};
+export default AppWrapper;
+
+/*
   <AuthProvider>
       <NavigationContainer>
         <AuthContext.Consumer>
@@ -203,6 +265,3 @@ const App = () => {
       </NavigationContainer>
     </AuthProvider>
   */
-};
-
-export default App;

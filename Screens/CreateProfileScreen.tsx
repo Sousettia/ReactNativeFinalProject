@@ -76,6 +76,7 @@ const CreateProfileScreen = ({ navigation, route }: any): React.JSX.Element => {
       }
     } catch (error: any) {
       if (axios.isAxiosError(error)) {
+        console.log("JWT Secret: ", process.env.JWT_SECRET); 
         console.log("Full Axios error object:", error);
         console.log("Axios error response:", error.response?.data);
         console.log("Axios error status:", error.response?.status);

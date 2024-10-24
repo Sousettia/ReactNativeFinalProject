@@ -1,7 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
-const authRoutes = require("./routes/auth");
+const userRoutes = require("./routes/userRoutes");
 
 dotenv.config();
 
@@ -9,7 +9,7 @@ const app = express();
 app.use(express.json()); // To parse JSON bodies
 
 // Routes
-app.use("/api/auth", authRoutes);
+app.use("/api/auth", userRoutes);
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
