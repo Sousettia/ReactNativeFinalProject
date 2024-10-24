@@ -189,7 +189,7 @@ function NotificationsStackScreen() {
 const App = () => {
   return (
     <NavigationContainer>
-      <LoginStackScreen />
+      <TabContainer />
     </NavigationContainer>
   );
   /*
