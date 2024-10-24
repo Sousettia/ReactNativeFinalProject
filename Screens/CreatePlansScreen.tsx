@@ -30,9 +30,9 @@ const CreatePlansScreen = ({ navigation, route }: any): React.JSX.Element => {
   };
 
   const renderComponent = () => {
-    if (selectedButton === "Create") {
+    if (selectedButton === "London") {
       return <Createplans/>;
-    } else if (selectedButton === "Add") {
+    } else if (selectedButton === "Bangkok") {
       return <Planid/>;
     }
     return null;
@@ -76,7 +76,7 @@ const CreatePlansScreen = ({ navigation, route }: any): React.JSX.Element => {
 
       <TouchableOpacity 
         style={styles.button} 
-        onPress={() => {setModalVisible(true), toggleModal("Create")}}>
+        onPress={() => {setModalVisible(true), toggleModal("London")}}>
         <Text style={styles.textButton}>Create Plan</Text>
       </TouchableOpacity>
       <Modal
@@ -110,8 +110,8 @@ const CreatePlansScreen = ({ navigation, route }: any): React.JSX.Element => {
       <TextInput style={styles.input} value={planId} onChangeText={setPlanId} />
       <TouchableOpacity 
           style={styles.button} 
-          onPress={() => {setModalVisible(true), toggleModal("Add")}}>
-          <Text style={styles.textButton}>Add ID</Text>
+          onPress={() => {setModalVisible(true), toggleModal("Bangkok")}}>
+          <Text style={styles.textButton}>Confirm</Text>
       </TouchableOpacity>
     </ScrollView>
   );
