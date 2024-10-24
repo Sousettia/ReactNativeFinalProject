@@ -22,13 +22,11 @@ exports.registerUser = async (req, res) => {
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
-
     res.json({ token });
   } catch (error) {
     res.status(500).json({ error: "Server error" });
   }
 };
-
 
 // Login User
 exports.loginUser = async (req, res) => {
@@ -54,6 +52,19 @@ exports.loginUser = async (req, res) => {
     });
 
     res.json({ token });
+  } catch (error) {
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+// Get User Profile (Protected Route)
+exports.getProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).select("-password"); // Exclude password
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+    res.json(user);
   } catch (error) {
     res.status(500).json({ error: "Server error" });
   }

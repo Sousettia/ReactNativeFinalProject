@@ -7,44 +7,43 @@ import {
   TextInput,
   Alert,
 } from "react-native";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import axios from "axios";
-import { AuthContext } from "../auth-backend/context/AuthContext";
+import {
+  useAppDispatch,
+  useAppSelector,
+} from "../auth-backend/redux-toolkit/hooks";
+import { selectAuthState, setIsLogin } from "../auth-backend/auth/auth-slice";
+import { login } from "../auth-backend/services/auth-service";
 
 const LogInScreen = ({
   navigation,
   route,
   onPress,
 }: any): React.JSX.Element => {
+  const dispatch = useAppDispatch();
   const [modalVisible, setModalVisible] = useState(false);
-  //const { login } = useContext(AuthContext); // Use login function from context
+  const { isLogin } = useAppSelector(selectAuthState);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-
+  const [showPassword, setShowPassword] = useState(false);
+  // Use useEffect to log the state when it changes
+  useEffect(() => {
+    console.log("Login Screen updated isLogin:", isLogin); // This will log when isLogin changes
+  }, [isLogin]); // This effect runs whenever isLogin is updated
+  
   const handleLogin = async () => {
-    // Basic validation
-    if (!username || !password) {
-      Alert.alert("Error", "Please fill in all fields.");
-      return;
-    }
-
+    console.log(username, password);
     try {
-      const response = await axios.post(
-        "http://192.168.1.192:5000/api/auth/login",
-        {
-          username: username,
-          password: password,
-        }
-      );
+      const response = await login(username, password);
 
       if (response.status === 200) {
+        console.log(response.data);
         Alert.alert("Success", "Logged in successfully!");
-        //login(response.data); // Use login function from context to set auth state
-        navigation.navigate("Home"); // Navigate to the HomeStack
+        dispatch(setIsLogin(true));
       } else {
         Alert.alert("Error", "Failed to log in.");
       }
@@ -173,6 +172,13 @@ const LogInScreen = ({
           value={password}
           onChangeText={setPassword}
           placeholder="Password"
+          secureTextEntry={!showPassword}
+        />
+        <Ionicons
+          name={showPassword ? "eye" : "eye-off"}
+          onPress={() => setShowPassword(!showPassword)}
+          style={styles.icon}
+          size={20}
         />
       </View>
 
@@ -254,7 +260,7 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    color: "#69aeb6",
+    color: "#000000",
     height: 40,
     marginLeft: 40, // Add margin to prevent text from overlapping the icon
     paddingHorizontal: 10,
