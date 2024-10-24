@@ -243,9 +243,13 @@ const App = (): React.JSX.Element => {
 };
 const AppWrapper = () => {
   return (
-    <NavigationContainer>
-      <LoginStackScreen />
-    </NavigationContainer>
+    <Provider store={store}>
+      <SafeAreaProvider>
+        <NavigationContainer>
+          <App />
+        </NavigationContainer>
+      </SafeAreaProvider>
+    </Provider>
   );
 };
 export default AppWrapper;
