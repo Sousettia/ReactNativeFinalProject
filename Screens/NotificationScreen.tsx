@@ -39,72 +39,81 @@ const NotificationScreen = () => {
   };
 
   return (
-    <ScrollView style={styles.container}
-    showsVerticalScrollIndicator={false}>
-      <Text style={styles.textTitle}>NOTIFICATION</Text>
-      <View style={styles.viewSetUp}>
-        <Text style={styles.textSetUp}>Allow The Notification</Text>
-        <TouchableOpacity
-          style={[styles.togglerWrapper, isEnabled && styles.togglerActive]}
-          onPress={toggleMainSwitch}
-        >
-          <View style={[styles.togglerSlider, isEnabled && styles.sliderActive]}>
-            <View style={[styles.togglerKnob, isEnabled && styles.knobActive]} />
-          </View>
-        </TouchableOpacity>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <View style={styles.header}>
+        <View>
+          <Text style={styles.screenTitle}>NOTIFICATION</Text>
+        </View>
       </View>
-
-      {isEnabled && (
-        <View style={styles.dropdown}>
+      <View style={styles.pad}>
+        {/* Toggle Notification */}
+        <View style={styles.viewSetUp}>
+          <Text style={styles.textSetUp}>Allow The Notification</Text>
           <TouchableOpacity
-            style={styles.radioButton}
-            onPress={() => selectNotificationPreference("all")}
+            style={[styles.togglerWrapper, isEnabled && styles.togglerActive]}
+            onPress={toggleMainSwitch}
           >
-            <View
-              style={[
-                styles.radioCircle,
-                notificationPreference === "all" && styles.selected,
-              ]}
-            />
-          </TouchableOpacity>
-          <Text style={styles.dropdownText}>Allow All notifications</Text>
-        </View>
-      )}
-      {isEnabled && (
-        <View style={styles.dropdown}>
-          <TouchableOpacity
-            style={styles.radioButton}
-            onPress={() => selectNotificationPreference("mentions")}
-          >
-            <View
-              style={[
-                styles.radioCircle,
-                notificationPreference === "mentions" && styles.selected,
-              ]}
-            />
-          </TouchableOpacity>
-          <Text style={styles.dropdownText}>Allow Only notifications</Text>
-        </View>
-      )}
-
-      <Text style={styles.text}>Plans Notification</Text>
-      {tripNotifications.map((trip, index) => (
-        <View key={index} style={styles.viewSetUp}>
-          <Text style={styles.textSetUp}>{trip}</Text>
-          <TouchableOpacity
-            style={[styles.togglerWrapper, tripStates[trip] && styles.togglerActive]}
-            onPress={() => toggleTripSwitch(trip)}
-          >
-            <View
-              style={[styles.togglerSlider, tripStates[trip] && styles.sliderActive]}
-            >
-              <View
-                style={[styles.togglerKnob, tripStates[trip] && styles.knobActive]}
-              />
+            <View style={[styles.togglerSlider, isEnabled && styles.sliderActive]}>
+              <View style={[styles.togglerKnob, isEnabled && styles.knobActive]} />
             </View>
           </TouchableOpacity>
         </View>
-      ))}
+
+        {/* Dropdown for Notification Preferences */}
+        {isEnabled && (
+          <>
+            <View style={styles.dropdown}>
+              <TouchableOpacity
+                style={styles.radioButton}
+                onPress={() => selectNotificationPreference("all")}
+              >
+                <View
+                  style={[
+                    styles.radioCircle,
+                    notificationPreference === "all" && styles.selected,
+                  ]}
+                />
+              </TouchableOpacity>
+              <Text style={styles.dropdownText}>Allow All notifications</Text>
+            </View>
+
+            <View style={styles.dropdown}>
+              <TouchableOpacity
+                style={styles.radioButton}
+                onPress={() => selectNotificationPreference("mentions")}
+              >
+                <View
+                  style={[
+                    styles.radioCircle,
+                    notificationPreference === "mentions" && styles.selected,
+                  ]}
+                />
+              </TouchableOpacity>
+              <Text style={styles.dropdownText}>Allow Only notifications</Text>
+            </View>
+
+            {/* Dropdown for Trip Notifications */}
+            <Text style={styles.text}>Plans Notification</Text>
+            <View style={styles.dropdownList}>
+              {tripNotifications.map((trip, index) => (
+                <View key={index} style={styles.viewSetUp}>
+                  <Text style={styles.textSetUp}>{trip}</Text>
+                  <TouchableOpacity
+                    style={[styles.togglerWrapper, tripStates[trip] && styles.togglerActive]}
+                    onPress={() => toggleTripSwitch(trip)}
+                  >
+                    <View
+                      style={[styles.togglerSlider, tripStates[trip] && styles.sliderActive]}
+                    >
+                      <View style={[styles.togglerKnob, tripStates[trip] && styles.knobActive]} />
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+          </>
+        )}
+      </View>
     </ScrollView>
   );
 };
@@ -114,38 +123,47 @@ export default NotificationScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#69aeb6",
-    padding: 20,
+    backgroundColor: "#eeeeee",
   },
-  textTitle: {
+  pad: {
+    padding: 5,
+  },
+  header: {
+    padding: 10,
+    backgroundColor: "#30777d",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  screenTitle: {
     marginTop: 50,
     marginBottom: 10,
     color: "#ffffff",
     fontWeight: "bold",
     textAlign: "left",
-    fontSize: 35,
+    fontSize: 30,
   },
   text: {
-    marginTop: 25,
-    marginBottom: 15,
-    color: "#ffffff",
+    fontSize: 22,
     fontWeight: "bold",
-    textAlign: "left",
-    fontSize: 20,
+    color: "#30777d",
+    marginTop: 15,
+    marginLeft: 15,
+    marginBottom: -5,
   },
   viewSetUp: {
-    backgroundColor: "#30777d",
+    backgroundColor: "#eeeeee",
     flexDirection: "row",
     alignItems: "center",
     marginTop: 10,
-    marginBottom: 10,
-    marginLeft: 5,
-    marginRight: 5,
-    borderRadius: 25,
     padding: 2,
+    borderBottomWidth: 2, // Bottom border to mimic the line
+    borderColor: "#E0E0E0",
+    marginRight: 20,
+    marginLeft: 20,
+    marginBottom: 10,
   },
   textSetUp: {
-    color: "#ffffff",
+    color: "#0d1b3b",
     fontWeight: "bold",
     fontSize: 20,
     marginLeft: 15,
@@ -191,18 +209,19 @@ const styles = StyleSheet.create({
     transform: [{ translateX: 30 }],
   },
   dropdown: {
-    backgroundColor: "#30777d",
+    backgroundColor: "#eeeeee",
     flexDirection: "row",
     alignItems: "center",
     marginTop: 10,
-    marginBottom: 10,
-    marginLeft: 5,
-    marginRight: 50,
-    borderRadius: 25,
     padding: 2,
+    borderBottomWidth: 2, // Bottom border to mimic the line
+    borderColor: "#E0E0E0",
+    marginRight: 20,
+    marginLeft: 20,
+    marginBottom: 10,
   },
   dropdownText: {
-    color: "#ffffff",
+    color: "#0d1b3b",
     fontWeight: "bold",
     fontSize: 20,
     marginLeft: 5,
@@ -226,5 +245,12 @@ const styles = StyleSheet.create({
   selected: {
     backgroundColor: "#3BEC17",
     borderColor: "#ffffff",
+  },
+  dropdownList: {
+    marginTop: 10,
+    marginBottom: 10,
+    backgroundColor: "#f0f0f0",
+    padding: 10,
+    borderRadius: 10,
   },
 });

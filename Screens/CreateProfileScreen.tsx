@@ -7,6 +7,7 @@ import {
   Pressable,
   Alert,
   Platform,
+  ScrollView,
 } from "react-native";
 import React, { useState } from "react";
 import * as ImagePicker from "expo-image-picker"; // Import Image Picker
@@ -101,7 +102,7 @@ const CreateProfileScreen = ({ navigation, route }: any): React.JSX.Element => {
     }
   };
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <Text style={styles.textTitle}>SKY SWAN</Text>
       <Text style={styles.TextWelcome}>WELCOME!!!</Text>
       <Text style={styles.TextCreate}>LET'S CREATE YOUR PROFILE</Text>
@@ -188,7 +189,7 @@ const CreateProfileScreen = ({ navigation, route }: any): React.JSX.Element => {
       >
         <Text style={styles.textStyle}>Confirm</Text>
       </Pressable>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -312,7 +313,8 @@ const styles = StyleSheet.create({
     height: 150, // Set a fixed height for the frame
     borderRadius: 75, // Rounded frame (optional)
     overflow: "hidden", // Ensure the image doesn't go outside the frame
-    marginTop: 20,
+    marginTop: 50,
+    marginBottom: 15,
   },
   imageFrame: {
     width: "100%",

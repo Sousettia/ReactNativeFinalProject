@@ -26,7 +26,12 @@ const ProfileScreen = ({ navigation, route }: any): React.JSX.Element => {
   return (
     
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <Text style={styles.textTitle}>PROFILE</Text>
+      <View style={styles.header}>
+        <View>
+          <Text style={styles.screenTitle}>PROFILE</Text>
+        </View>  
+      </View>
+      <View style={styles.pad}>
       <Image
         source={require("../assets/Image/CreateProfile.png")}
         resizeMode="contain"
@@ -75,6 +80,7 @@ const ProfileScreen = ({ navigation, route }: any): React.JSX.Element => {
       >
         <Text style={styles.textLogout}>Log out</Text>
       </Pressable>
+      </View>
     </ScrollView>
   );
 };
@@ -89,10 +95,30 @@ const calculateAge = (dob: Date) => {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1, // ทำให้ View ขยายเต็มหน้าจอ
+    backgroundColor: "#eeeeee",
+  },
   Line: {
     marginTop: 2,
   },
-
+  header: {
+    padding: 10,
+    backgroundColor:'#30777d',
+    alignItems:'center',
+    marginBottom:10,
+  },
+  screenTitle:{
+    marginTop: 50,
+    marginBottom: 10,
+    color: "#ffffff",
+    fontWeight: "bold",
+    textAlign: "left",
+    fontSize: 30,
+  },
+  pad:{
+    padding:10,
+  },
   icons: {
     fontSize: 25,
     color: "#6b8d71",
@@ -102,9 +128,9 @@ const styles = StyleSheet.create({
   },
   myImage: {
     width: "100%",
-    height: 120,
-    marginTop: 40,
-    marginBottom: 35,
+    height: 140,
+    marginTop: 15,
+    marginBottom: 10,
   },
   textTitle: {
     marginTop: 50,
@@ -116,7 +142,7 @@ const styles = StyleSheet.create({
   },
   textStyle: {
     borderRadius: 25,
-    color: "#ffffff",
+    color: "#30777d",
     fontWeight: "bold",
     textAlign: "left",
     fontSize: 18,
@@ -144,24 +170,20 @@ const styles = StyleSheet.create({
     backgroundColor: "#a43939",
     marginTop: 25,
   },
-  container: {
-    flex: 1, // ทำให้ View ขยายเต็มหน้าจอ
-    backgroundColor: "#69aeb6",
-    padding: 20,
-  },
+  
   input: {
     color: "black",
     height: 40,
-    borderRadius: 25,
+    borderRadius: 10,
     marginLeft: 20,
     marginRight: 20,
     marginTop: 10,
     marginBottom: 10,
     paddingHorizontal: 15,
-    backgroundColor: "#a4e1e7",
+    backgroundColor: "#eeeeee",
     fontSize: 15,
     fontWeight: "bold",
-    borderColor: "#a4e1e7",
+    borderColor: "#dddddd",
     borderWidth: 2, // ความหนาของขอบ
   },
   genderContainer: {

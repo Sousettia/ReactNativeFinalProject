@@ -6,6 +6,7 @@ import {
   TextInput,
   Pressable,
   Alert,
+  ScrollView,
 } from "react-native";
 import React, { useState } from "react";
 import axios from "axios";
@@ -54,7 +55,7 @@ const CreateAccount2 = ({ navigation, route }: any): React.JSX.Element => {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <Image
         source={require("../assets/Image/Logo.png")}
         resizeMode="contain"
@@ -117,7 +118,7 @@ const CreateAccount2 = ({ navigation, route }: any): React.JSX.Element => {
       >
         <Text style={styles.textStyle}>Confirm</Text>
       </Pressable>
-    </View>
+    </ScrollView>
   );
 };
 

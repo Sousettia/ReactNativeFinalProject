@@ -6,6 +6,7 @@ import {
   Pressable,
   TextInput,
   Alert,
+  ScrollView,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -57,7 +58,7 @@ const LogInScreen = ({
     }
   };
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* รูปโลโก้ */}
       <Image
         source={require("../assets/Image/Logo.png")}
@@ -190,7 +191,7 @@ const LogInScreen = ({
       >
         <Text style={styles.textStyle}>Login</Text>
       </Pressable>
-    </View>
+    </ScrollView>
   );
 };
 

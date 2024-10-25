@@ -61,8 +61,13 @@ const _renderItem = ({ item }: RenderItemProps) => (
   </TouchableOpacity>
 );
 return (
-  <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-    <Text style={styles.textTitle}>PLANS</Text>
+  <View style={styles.container}>
+    <View style={styles.header}>
+        <View>
+          <Text style={styles.screenTitle}>PLANS</Text>
+        </View>  
+    </View>
+    <ScrollView showsVerticalScrollIndicator={false}>
     <FlatList
       data={plans} 
       renderItem={_renderItem} 
@@ -131,7 +136,8 @@ return (
         <Text style={styles.text}>Plan-Id:</Text>
       </View>
     </Modal>
-  </ScrollView>
+    </ScrollView>
+  </View>
 );
 }
 
@@ -140,14 +146,25 @@ export default PlansScreen
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#69aeb6',
+    backgroundColor: '#eeeeee',
   },
   header: {
-    padding: 20,
+    padding: 10,
+    backgroundColor:'#30777d',
+    alignItems:'center',
+    marginBottom:10,
   },
   textTitle: {
-    marginLeft:10,
+    fontSize: 20, 
+    fontWeight: 'bold', 
+    color: '#333', 
+    marginVertical: 10,  // เพิ่ม margin ด้านบนและด้านล่าง
+    marginLeft: 20,      // ขยับข้อความไปทางซ้าย
+    textAlign: 'left',   // จัดให้อยู่ทางซ้าย
+  },
+  screenTitle:{
     marginTop: 50,
+    marginBottom: 10,
     color: "#ffffff",
     fontWeight: "bold",
     textAlign: "left",
@@ -171,7 +188,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginVertical: 8,
     paddingHorizontal: 20,
-    backgroundColor: '#A4E1E7',
+    backgroundColor: '#ffffff',
     borderRadius: 20,
     padding: 15,
     shadowOpacity: 0.25,
@@ -193,7 +210,7 @@ const styles = StyleSheet.create({
   planTitle: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#30777d',
   },
   planDetail: {
     fontSize: 16,

@@ -53,9 +53,9 @@ function TabContainer() {
             iconName = focused ? "people" : "people-outline";
             size = 30;
           } else if (route.name === "CreatePlansStack") {
-            iconName = focused ? "add-circle" : "add-circle-outline";
-            size = 40;
-            color = "white";
+            iconName = focused ? "add-circle" : "add-circle";
+            size = 71;
+            color = "#30777d";
           } else if (route.name === "ProfileStack") {
             iconName = focused ? "person" : "person-outline";
             size = 30;
@@ -65,10 +65,10 @@ function TabContainer() {
           }
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: "#ddf3f5",
-        tabBarInactiveTintColor: "#69aeb6",
+        tabBarActiveTintColor: "#30777d",
+        tabBarInactiveTintColor: "#30777d",
         tabBarStyle: {
-          backgroundColor: "#417F85",
+          backgroundColor: "#ffffff",
           height: 60,
           paddingBottom: 3,
         },
@@ -87,7 +87,11 @@ function TabContainer() {
       <Tab.Screen
         name="CreatePlansStack"
         component={CreatePlansStackScreen}
-        options={{ tabBarLabel: "" }}
+        options={{
+          tabBarLabel: "",
+          tabBarItemStyle: { marginTop: -24 },
+          tabBarStyle: { display: 'none' }, // ซ่อน tabBar 
+        }}
       />
       <Tab.Screen
         name="ProfileStack"
@@ -108,8 +112,9 @@ function LoginStackScreen() {
     <LoginStack.Navigator
       initialRouteName="Welcome"
       screenOptions={{
-        headerStyle: { backgroundColor: "#417F85" },
+        headerStyle: { backgroundColor: "#69aeb6" },
         headerTitleStyle: { fontWeight: "bold" },
+        headerShown: false
       }}
     >
       <LoginStack.Screen
@@ -164,6 +169,7 @@ function CreatePlansStackScreen() {
       <CreatePlansStack.Screen
         name="CreatePlans"
         component={CreatePlansScreen}
+        
       />
     </CreatePlansStack.Navigator>
   );
@@ -239,7 +245,8 @@ const App = (): React.JSX.Element => {
     );
   }
 
-  return isLogin ? <TabContainer /> : <LoginStackScreen />; //return App
+  //return isLogin ? <TabContainer /> : <LoginStackScreen />; //return App
+  return <TabContainer/>
 };
 const AppWrapper = () => {
   return (
