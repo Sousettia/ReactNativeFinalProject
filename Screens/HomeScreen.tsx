@@ -20,20 +20,20 @@ id: string;
 title: string;
 budget: string;
 date: string;
+image: any;
 }
 
 type RenderItemProps = { item: PlansItem };
 
 const PlansScreen = () => {
-const [plans, setPlans] = useState<PlansItem[]>([
-  { id: "1", title: "Camp Trip", budget: "3,000 baht", date: "8/16/2028" },
-  { id: "2", title: "Sea Trip", budget: "2,000 baht", date: "10/25/2026" },
-  { id: "3", title: "Chang rai Trip", budget: "8,000 baht", date: "10/25/2026" },
-  { id: "4", title: "Japan Trip", budget: "8,000 baht", date: "10/25/2026" },
-  { id: "5", title: "Puket Trip", budget: "8,000 baht", date: "10/25/2026" },  
-  { id: "6", title: "Chang Mai Trip", budget: "8,000 baht", date: "10/25/2026" },  
-
-]);
+  const [plans, setPlans] = useState<PlansItem[]>([
+    { id: "1", title: "Camp Trip", budget: "3,000 baht", date: "8/16/2025", image: require("../assets/Image/CampTrip.png") },
+    { id: "2", title: "Sea Trip", budget: "2,000 baht", date: "10/25/2026", image: require("../assets/Image/SeaTrip.png") },
+    { id: "3", title: "Chang rai Trip", budget: "8,000 baht", date: "12/25/2026", image: require("../assets/Image/ChiangRaiTrip.png") },
+    { id: "4", title: "Japan Trip", budget: "8,000 baht", date: "2/20/2027", image: require("../assets/Image/JapanTrip.png") },
+    { id: "5", title: "Puket Trip", budget: "8,000 baht", date: "5/25/2027", image: require("../assets/Image/PuketTrip.png") },
+    { id: "6", title: "Chang Mai Trip", budget: "8,000 baht", date: "8/16/2028", image: require("../assets/Image/ChiangMaiTrip.png") },
+  ]);
 const [isModalVisible, setModalVisible] = useState(false);
 const [description, setDescription] = useState("");
 const [selectedPlan, setSelectedPlan] = useState<PlansItem | null>(null);
@@ -44,8 +44,13 @@ const _renderItem = ({ item }: RenderItemProps) => (
   <TouchableOpacity 
     style={styles.planContainer}
   >
+    <View>
+      <Image source={item.image} style={styles.planImage} />
+    </View>
+    <View >
     <Text style={styles.planTitle}>{item.title}</Text>
     <Text style={styles.planDetail}>{item.date}</Text>
+    </View>
   </TouchableOpacity>
 );
 return (
@@ -59,7 +64,7 @@ return (
           />
           <View>
           <Text style={styles.textTitle}>Welcome,</Text>
-          <Text style={styles.textUserTitle}>Welcome,</Text>
+          <Text style={styles.textUserTitle}>GBcatW</Text>
         </View>  
       </View>
       {/*Search bar */}
@@ -152,16 +157,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 10,
   },
-  planContainer: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    borderRadius: 20,
-    padding: 15,
-    backgroundColor: "#ffffff",
-    height: 180, 
-    marginTop: 20,  
-    aspectRatio: 1,
-  },
+  
   profileContainer:{
     display:'flex',
     flexDirection:'row',
@@ -183,16 +179,7 @@ const styles = StyleSheet.create({
     flexDirection:'row',
     marginBottom: 8,
   },
-  planTitle: {
-    fontSize: 17,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  planDetail: {
-    fontSize: 14,
-    color: '#333',
-    marginTop: 5,
-  },
+
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
@@ -281,4 +268,40 @@ const styles = StyleSheet.create({
     right: 30,
     bottom: 10,
   },
+  
+  planContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    borderRadius: 20,
+    backgroundColor: "#ffffff",
+    height: 180, 
+    marginTop: 20,  
+    aspectRatio: 1,
+    overflow: "hidden",  // Ensure the image fits within rounded corners
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 4,
+  },
+  planImage: {
+    width: '100%',
+    height: '100%',  // Adjust to reserve space for text at the bottom
+    resizeMode: 'cover',
+  },
+  planTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+    paddingHorizontal: 10,
+    paddingTop: 5,
+  },
+  planDetail: {
+    fontSize: 14,
+    color: '#333',
+    paddingHorizontal: 10,
+    marginBottom: 5,
+  },
+
+  
 });
