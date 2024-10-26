@@ -20,7 +20,7 @@ export async function getProfile() {
   const tokenString = await AsyncStorage.getItem("@token");
   //ถ้าไม่มี token
   if (!tokenString) {
-    console.log("No token")
+    console.log("Profile No token");
     return null;
   }
   //ถ้ามี token

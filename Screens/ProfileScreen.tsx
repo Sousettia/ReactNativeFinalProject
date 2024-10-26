@@ -12,19 +12,14 @@ import icons from "react-native-vector-icons";
 import { logout } from "../auth-backend/services/auth-service";
 import { useAppDispatch, useAppSelector } from "../auth-backend/redux-toolkit/hooks";
 import { selectAuthState, setIsLogin } from "../auth-backend/auth/auth-slice";
-const ProfileScreen = ({ navigation, route }: any): React.JSX.Element => {
-  const [nickname, setNickname] = useState("");
-  const [status, setStatus] = useState("");
-  const [age, setAge] = useState("");
-  const [gender, setGender] = useState("");
-  const [uid, setUid] = useState("");
+const ProfileScreen = (): React.JSX.Element => {
   
   const dispatch = useAppDispatch();
   const { isLogin } = useAppSelector(selectAuthState);
   const { profile } = useAppSelector(selectAuthState);
 
   return (
-    
+
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
         <View>

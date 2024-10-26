@@ -13,6 +13,9 @@ app.use(express.json()); // To parse JSON bodies
 // Routes
 app.use("/api/auth", userRoutes);
 
+const planRoutes = require('./routes/planRoutes');
+app.use('/api/plans', planRoutes);
+
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB connected'))

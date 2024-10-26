@@ -16,13 +16,7 @@ exports.registerUser = async (req, res) => {
     // Create new user with additional fields
     user = new User({ username, email, password, nickname, DoB, gender });
     await user.save();
-
-    // Generate JWT
-    const payload = { userId: user.id };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
-    res.json({ token });
+    res.json({ status:"Account Created Successfully" });
   } catch (error) {
     res.status(500).json({ error: "Server error" });
   }

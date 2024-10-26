@@ -4,133 +4,287 @@ import {
   View,
   Image,
   TextInput,
-  Pressable,
   Modal,
-  Touchable,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import React, { useState } from "react";
-import icons from "react-native-vector-icons";
 import { ScrollView } from "react-native-gesture-handler";
 import Createplans from "../components/Createplans";
 import Planid from "../components/Planid";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import {
+  useAppSelector,
+} from "../auth-backend/redux-toolkit/hooks";
+import { selectAuthState } from "../auth-backend/auth/auth-slice";
+import axios from "axios";
 
 const CreatePlansScreen = ({ navigation, route }: any): React.JSX.Element => {
+  const { profile } = useAppSelector(selectAuthState);
+
   const [planName, setPlanName] = useState("");
   const [budget, setBudget] = useState("");
-  const [dateOnTrip, setDateOnTrip] = useState("");
+  const [dateOnTrip, setDateOnTrip] = useState<Date | null>(null); // Initialize DoB as null
   const [description, setDescription] = useState("");
   const [planId, setPlanId] = useState("");
+  const [creator, setCreator] = useState("");
+
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedButton, setSelectedButton] = useState("");
+  const [showDatePicker, setShowDatePicker] = useState(false); // Toggle for date pick
+
+  // Utility function to generate a 5-character plan ID
+  const generatePlanId = () => {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let planId = "";
+    for (let i = 0; i < 5; i++) {
+      planId += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return planId;
+  };
 
   const toggleModal = (plan: string) => {
     setSelectedButton(plan);
     setModalVisible(true);
   };
 
+  // Handle Date Picker change
+  const handleDateChange = (event: any, selectedDate?: Date) => {
+    if (selectedDate) {
+      setDateOnTrip(selectedDate); // Set the selected date
+    }
+    setShowDatePicker(false); // Hide the picker after selection
+  };
+
+  // Format date for display
+  const formatDate = (dateOnTrip: Date) => {
+    if (!dateOnTrip) return "";
+    const d = new Date(dateOnTrip);
+    return `${d.getDate().toString().padStart(2, "0")}/${(d.getMonth() + 1)
+      .toString()
+      .padStart(2, "0")}/${d.getFullYear()}`;
+  };
+
+  const handleBudgetChange = (text: string) => {
+    // Remove any non-numeric characters and THB symbol
+    const numericValue = text.replace(/[^0-9]/g, "");
+    setBudget(numericValue);
+  };
+
+  // Format the budget for display with THB
+  const formatBudget = (value: string) => {
+    if (!value) return "";
+    const number = parseInt(value, 10);
+    // Format with commas and add THB
+    return `${number.toLocaleString("th-TH")} THB`;
+  };
+
+  const handleCreatePlan = async () => {
+    // Form validation
+    if (!planName.trim()) {
+      Alert.alert("Error", "Please enter a plan name");
+      return;
+    }
+
+    if (!dateOnTrip) {
+      Alert.alert("Error", "Please select a date for the trip");
+      return;
+    }
+
+    if (!budget) {
+      Alert.alert("Error", "Please enter a budget");
+      return;
+    }
+
+    // Generate a new plan ID
+    const newPlanId = generatePlanId();
+
+    // Get creator ID from profile
+    const creatorId = profile?._id;
+
+    if (!creatorId) {
+      Alert.alert("Error", "User profile not found");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        "http://192.168.1.192:5000/api/plans/create",
+        {
+          planId: newPlanId,
+          planName: planName.trim(),
+          dateOnTrip: dateOnTrip.toISOString().split("T")[0], // Format date to YYYY-MM-DD
+          budget: parseInt(budget.replace(/[^0-9]/g, "")), // Remove non-numeric chars and convert to number
+          description: description.trim(),
+          creator: creatorId,
+        }
+      );
+
+      if (response.status === 201) {
+        // Clear the form
+        setPlanName("");
+        setBudget("");
+        setDateOnTrip(null);
+        setDescription("");
+        setPlanId("");
+
+        // Close the modal if it's open
+        setModalVisible(false);
+
+        Alert.alert("Success", "Plan created successfully!");
+
+        // Optionally navigate to another screen
+        // navigation.navigate('PlanDetails', { planId: newPlanId });
+      } else {
+        Alert.alert("Error", "Failed to create plan.");
+      }
+    } catch (error: any) {
+      if (axios.isAxiosError(error)) {
+        console.log("Full Axios error object:", error);
+        console.log("Axios error response:", error.response?.data);
+        console.log("Axios error status:", error.response?.status);
+
+        if (error.response && error.response.status === 400) {
+          Alert.alert(
+            "Error",
+            "Invalid plan data. Please check your input and try again."
+          );
+        } else {
+          Alert.alert(
+            "Error",
+            `An error occurred while creating the plan: ${
+              error.response?.data?.message || error.message
+            }`
+          );
+        }
+      } else {
+        console.log("Unexpected error:", error);
+        Alert.alert(
+          "Error",
+          "An unexpected error occurred while creating the plan."
+        );
+      }
+    }
+  };
+
   const renderComponent = () => {
     if (selectedButton === "Create") {
-      return <Createplans/>;
+      return <Createplans />;
     } else if (selectedButton === "Add") {
-      return <Planid/>;
+      return <Planid />;
     }
     return null;
   };
-  const gotoHome = () => {
-    navigation.navigate("Home");
-  };
 
   return (
-    <View style={styles.container} >
-        <View style={styles.headerContain}>
-          <Text style={styles.screenTitle}>CREATE PLANS</Text>
-        </View> 
+    <View style={styles.container}>
+      <View style={styles.headerContain}>
+        <Text style={styles.screenTitle}>CREATE PLANS</Text>
+      </View>
       <ScrollView showsVerticalScrollIndicator={false}>
-      <View style={styles.header}>
-        <Image
-          source={require("../assets/Image/CreateProfile.png")}
-          resizeMode="contain"
-          style={styles.myImage}
-        />
-      
-      <Text style={styles.textStyle}>Plan Name</Text>
-      <TextInput
-        style={styles.input}
-        value={planName}
-        onChangeText={setPlanName}
-      />
-       <Text style={styles.textStyle}>Date On Trip</Text>
-      <TextInput
-        style={styles.input}
-        value={dateOnTrip}
-        onChangeText={setDateOnTrip}
-        placeholder=" MM/DD/YYYY"
-      />
-      </View>
-      <View style={styles.contain}>
-      <Text style={styles.textStyle1}>Budget</Text>
-      <TextInput
-          style={styles.budgetInput}
-          value={budget}
-          onChangeText={setBudget}
-          placeholder="0.00"
-          keyboardType="numeric"
-        />
-      <Text style={styles.textStyle1}>Description</Text>
-      <TextInput
-        style={styles.description}
-        multiline
-        numberOfLines={7}
-        value={description}
-        onChangeText={setDescription}
-        textAlignVertical="top"
-      />
+        <View style={styles.header}>
+          <Image
+            source={require("../assets/Image/CreateProfile.png")}
+            resizeMode="contain"
+            style={styles.myImage}
+          />
 
-      <TouchableOpacity 
-        style={styles.button} 
-        onPress={() => {setModalVisible(true), toggleModal("Create")}}>
-        <Text style={styles.textButton}>Create Plan</Text>
-      </TouchableOpacity>
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={isModalVisible}
-        onRequestClose={() => {
-          setModalVisible(!setModalVisible);
-        }}
-        
-      >
-        <View style={styles.modalView}>
-          {renderComponent()}
-          <View style={styles.buttomView}>
+          <Text style={styles.textStyle}>Plan Name</Text>
+          <TextInput
+            style={styles.input}
+            value={planName}
+            onChangeText={setPlanName}
+          />
+          <Text style={styles.textStyle}>Date On Trip</Text>
           <TouchableOpacity
-            style={styles.touchableOpacityCancel}
-            onPress={() => setModalVisible(false)}
+            style={styles.input}
+            onPress={() => setShowDatePicker(true)}
           >
-            <Text style={styles.textButton}>Cancel</Text>
+            <Text style={dateOnTrip ? styles.dateinput : styles.placeholder}>
+              {dateOnTrip ? formatDate(dateOnTrip) : "SELECT DATE"}
+            </Text>
           </TouchableOpacity>
+
+          {showDatePicker && (
+            <DateTimePicker
+              value={dateOnTrip || new Date()}
+              mode="date"
+              display="default"
+              onChange={handleDateChange}
+            />
+          )}
+        </View>
+        <Text style={styles.textStyle1}>Budget</Text>
+        <View style={styles.contain}>
+          <TextInput
+            style={[
+              styles.budgetInput,
+              // Add right padding to prevent text overlapping with THB
+              { paddingRight: 15 },
+            ]}
+            value={formatBudget(budget)}
+            onChangeText={handleBudgetChange}
+            placeholder="0.00"
+            keyboardType="numeric"
+            placeholderTextColor="#69aeb6"
+          />
+          <Text style={styles.textStyle1}>Description</Text>
+          <TextInput
+            style={styles.description}
+            multiline
+            numberOfLines={7}
+            value={description}
+            onChangeText={setDescription}
+            textAlignVertical="top"
+          />
+
           <TouchableOpacity
-            style={styles.touchableOpacityConfirm}
-            onPress={() => setModalVisible(false)}
+            style={styles.button}
+            onPress={() => {
+              setModalVisible(true), toggleModal("Create"), handleCreatePlan();
+            }}
           >
-            <Text style={styles.textButton}>Confirm</Text>
+            <Text style={styles.textButton}>Create Plan</Text>
           </TouchableOpacity>
-          </View>
-    </View>
-      </Modal>
-      <Text style={styles.textOr}>__________________ OR __________________</Text>
-      <Text style={styles.textStyle1}>Plan ID</Text>
-      <TextInput 
-        style={styles.planInput} 
-        value={planId} 
-        onChangeText={setPlanId} />
-      <TouchableOpacity 
-          style={styles.button} 
-          onPress={() => {setModalVisible(true), toggleModal("Add")}}>
-          <Text style={styles.textButton}>Add ID</Text>
-      </TouchableOpacity>
-      </View>
+          <Modal
+            animationType="fade"
+            transparent={true}
+            visible={isModalVisible}
+            onRequestClose={() => {
+              setModalVisible(!setModalVisible);
+            }}
+          >
+            <View style={styles.modalView}>
+              {renderComponent()}
+              <View style={styles.buttomView}>
+                <TouchableOpacity
+                  style={styles.touchableOpacityConfirm}
+                  onPress={() => setModalVisible(false)}
+
+                >
+                  <Text style={styles.textButton}>Confirm</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+          <Text style={styles.textOr}>
+            __________________ OR __________________
+          </Text>
+          <Text style={styles.textStyle1}>Plan ID</Text>
+          <TextInput
+            style={styles.planInput}
+            value={planId}
+            onChangeText={setPlanId}
+          />
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => {
+              setModalVisible(true), toggleModal("Add");
+            }}
+          >
+            <Text style={styles.textButton}>Add ID</Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </View>
   );
@@ -141,18 +295,18 @@ export default CreatePlansScreen;
 const styles = StyleSheet.create({
   headerContain: {
     padding: 10,
-    backgroundColor:'#30777d',
-    alignItems:'center',
+    backgroundColor: "#30777d",
+    alignItems: "center",
   },
   header: {
     padding: 10,
-    backgroundColor:'#30777d',
-    marginBottom:10,
+    backgroundColor: "#30777d",
+    marginBottom: 10,
   },
-  contain:{
-    marginTop:20
+  contain: {
+    marginTop: 20,
   },
-  screenTitle:{
+  screenTitle: {
     marginTop: 50,
     marginBottom: 10,
     color: "#ffffff",
@@ -173,22 +327,22 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
-    justifyContent: 'center',
-    marginTop:370,
+    justifyContent: "center",
+    marginTop: 370,
   },
   modalText: {
     borderRadius: 25,
     fontWeight: "bold",
     marginBottom: 15,
     fontSize: 18,
-    textAlign: 'center',
+    textAlign: "center",
   },
   closeButton: {
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 30,
     marginTop: 20,
-    alignItems:'center'
+    alignItems: "center",
   },
   myImage: {
     width: "100%",
@@ -204,13 +358,13 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 35,
   },
-  textOr:{
+  textOr: {
     color: "#c3c3c3",
     fontWeight: "bold",
     textAlign: "center",
     fontSize: 20,
-    marginBottom:20,
-    marginTop:20,
+    marginBottom: 20,
+    marginTop: 20,
   },
   textStyle1: {
     borderRadius: 25,
@@ -235,21 +389,21 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 20,
   },
-  buttomView:{
-    width: '100%',
-    flexDirection: 'row'
+  buttomView: {
+    width: "100%",
+    flexDirection: "row",
   },
-  touchableOpacityCancel:{
-    flex:1,
-    paddingVertical:10,
-    alignItems: 'center',
+  touchableOpacityCancel: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: "center",
     backgroundColor: "#c0c0c0",
     borderBottomLeftRadius: 20,
   },
-  touchableOpacityConfirm:{
-    flex:1,
-    paddingVertical:10,
-    alignItems: 'center',
+  touchableOpacityConfirm: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: "center",
     backgroundColor: "#69aeb6",
     borderBottomRightRadius: 20,
   },
@@ -296,27 +450,45 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "bold",
   },
+  dateinput: {
+    color: "black",
+    height: 40,
+    marginRight: 20,
+    marginTop: 10,
+    marginBottom: 10,
+    fontSize: 15,
+    fontWeight: "bold",
+  },
+  placeholder: {
+    position: "absolute", // Position the placeholder in the input field
+    left: 15, // Adjust to where you want the placeholder to appear
+    top: "25%", // Vertically center the text
+    color: "#4d4a4a", // Placeholder color (similar to system color)
+    fontSize: 15, // Font size of the placeholder
+    fontWeight: "bold",
+    zIndex: 1, // Ensure the placeholder is above the TextInput
+  },
   budgetInput: {
     color: "#69aeb6", // Same blue color as the image text
     fontWeight: "bold",
-    fontSize: 28,     // Larger font size for the amount
+    fontSize: 28, // Larger font size for the amount
     textAlign: "right", // Align to the right
     height: 40,
     borderBottomWidth: 2, // Bottom border to mimic the line
-    borderColor: "#E0E0E0", 
+    borderColor: "#E0E0E0",
     marginRight: 20,
     marginLeft: 20,
     marginBottom: 10,
   },
   planInput: {
     fontWeight: "bold",
-    fontSize: 20,     // Larger font size for the amount
+    fontSize: 20, // Larger font size for the amount
     height: 40,
     borderWidth: 2, // Bottom border to mimic the line
-    borderColor: "#E0E0E0", 
+    borderColor: "#E0E0E0",
     marginRight: 20,
     marginLeft: 20,
-    marginTop:10,
+    marginTop: 10,
     marginBottom: 10,
   },
 });
