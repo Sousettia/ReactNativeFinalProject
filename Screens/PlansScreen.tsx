@@ -11,158 +11,195 @@ import {
   Modal,
   TextInput,
 } from "react-native";
-import React, { useState } from 'react'
+import React, { useEffect, useState } from "react";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
+import {
+  useAppDispatch,
+  useAppSelector,
+} from "../auth-backend/redux-toolkit/hooks"; // Assuming you have your typed hooks
+import { selectPlans, setPlans } from "../auth-backend/auth/plan-slice";
+import { getAllPlans } from "../auth-backend/services/plan-service";
 
-interface PlansItem {
-id: string;
-title: string;
-budget: string;
-date: string;
+interface oldPlansItem {
+  id: string;
+  title: string;
+  budget: string;
+  date: string;
 }
 
-type RenderItemProps = { item: PlansItem };
+type RenderItemProps = { item: oldPlansItem };
 
 const PlansScreen = () => {
-const [plans, setPlans] = useState<PlansItem[]>([
-  { id: "1", title: "Camp Trip", budget: "3,000 baht", date: "8/16/2028" },
-  { id: "2", title: "Sea Trip", budget: "2,000 baht", date: "10/25/2026" },
-  { id: "3", title: "Chang rai Trip", budget: "8,000 baht", date: "10/25/2026" },
-  // Add other items...
-]);
-const [isModalVisible, setModalVisible] = useState(false);
-const [description, setDescription] = useState("");
-const [selectedPlan, setSelectedPlan] = useState<PlansItem | null>(null);
+  const dispatch = useAppDispatch();
 
-const updatePlanBudget = (updatedBudget: string) => {
-  if (selectedPlan) {
-    const updatedPlans = plans.map(plan =>
-      plan.id === selectedPlan.id
-        ? { ...plan, budget: updatedBudget }
-        : plan
-    );
-    setPlans(updatedPlans);
-  }
-};
+  const [oldplans, setoldPlans] = useState<oldPlansItem[]>([]);
 
-//ฟังก์ชัน _renderItem
-const _renderItem = ({ item }: RenderItemProps) => (
-  <TouchableOpacity 
-    style={styles.planContainer}
-    onPress={() => {
-      setSelectedPlan(item);
-      setModalVisible(true);
-    }}
-  >
-    <Text style={styles.planTitle}>{item.title}</Text>
-    <Text style={styles.planDetail}>{item.budget}</Text>
-    <Text style={styles.planDetail}>{item.date}</Text>
-  </TouchableOpacity>
-);
-return (
-  <View style={styles.container}>
-    <View style={styles.header}>
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [description, setDescription] = useState("");
+  const [selectedPlan, setSelectedPlan] = useState<oldPlansItem | null>(null);
+
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        const response = await getAllPlans();
+        if (response && response.data) {
+          console.log("Fetched plans:", response.data); // Log fetched plans
+
+          // Map the fetched data to match the oldPlansItem interface
+          const newPlans = response.data.map((plan: any) => ({
+            id: plan._id,
+            title: plan.planName,
+            budget: `${plan.budget} baht`,
+            date: new Date(plan.dateOnTrip).toLocaleDateString(), // Convert date to a readable format
+          }));
+
+          // Replace the old plans with the newly fetched plans
+          setoldPlans(newPlans);
+          dispatch(setPlans(response.data)); // Optional: Set plans in the global state
+        }
+      } catch (error) {
+        console.error("Error fetching plans:", error);
+      }
+    };
+
+    fetchPlans(); // Fetch plans on component mount
+  }, [dispatch]);
+
+  const updatePlanBudget = (updatedBudget: string) => {
+    if (selectedPlan) {
+      const updatedPlans = oldplans.map((oldplans) =>
+        oldplans.id === selectedPlan.id
+          ? { ...oldplans, budget: updatedBudget }
+          : oldplans
+      );
+      setoldPlans(updatedPlans);
+    }
+  };
+
+  //ฟังก์ชัน _renderItem
+  const _renderItem = ({ item }: RenderItemProps) => (
+    <TouchableOpacity
+      style={styles.planContainer}
+      onPress={() => {
+        setSelectedPlan(item);
+        setModalVisible(true);
+      }}
+    >
+      <Text style={styles.planTitle}>{item.title}</Text>
+      <Text style={styles.planDetail}>{item.budget}</Text>
+      <Text style={styles.planDetail}>{item.date}</Text>
+    </TouchableOpacity>
+  );
+  return (
+    <View style={styles.container}>
+      <View style={styles.header}>
         <View>
           <Text style={styles.screenTitle}>PLANS</Text>
-        </View>  
-    </View>
-    <ScrollView showsVerticalScrollIndicator={false}>
-    <FlatList
-      data={plans} 
-      renderItem={_renderItem} 
-      keyExtractor={(item) => item.id}
-      scrollEnabled={false}
-      ListHeaderComponent={() => (
-        <View>
-          <FlatList
-            showsHorizontalScrollIndicator={false}
-            horizontal={true}
-            data={plans} 
-            renderItem={_renderItem} 
-            keyExtractor={(item) => item.id}
-          />
-          <Text style={styles.textTitle}>YOUR CREATE PLANS</Text>
         </View>
-      )}
-    />
-
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={isModalVisible}
-      onRequestClose={() => setModalVisible(false)}
-    >
-      <View style={styles.box}>
-        <Pressable onPress={() => setModalVisible(false)}>
-          <Text style={styles.closeButton}>X</Text>
-        </Pressable>
-        <Text style={styles.textModalTitle}>{selectedPlan?.title}</Text>
-        <View style={styles.textView}>
-          <Text style={styles.text}>Budget: </Text>
-          <TextInput
-            style={styles.textResult}
-            value={selectedPlan?.budget}
-            editable={true} // Allow editing
-            onChangeText={(newText) => {
-              if (selectedPlan) {
-                updatePlanBudget(newText); // Update the plan's budget
-                setSelectedPlan({ ...selectedPlan, budget: newText }); // Update selected plan locally
-              }
-            }}
-          />
-        <Ionicons
-          style={styles.editText}
-          name="pencil-outline" size={20} color="white" />
-        </View>
-        <View style={styles.textView}>
-          <Text style={styles.text}>Date on trip: </Text>
-          <Text style={styles.textResult}>{selectedPlan?.date}</Text>
-          <Ionicons
-            style={styles.editText}
-            name="pencil-outline" size={20} color="white" />
-        </View>
-        <Text style={styles.text}>Description:</Text>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.description}
-            value={description}
-            onChangeText={setDescription}
-            multiline
-            numberOfLines={4}
-            textAlignVertical="top"
-          />
-        </View>
-        <Text style={styles.text}>Plan-Id:</Text>
       </View>
-    </Modal>
-    </ScrollView>
-  </View>
-);
-}
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <FlatList
+          data={oldplans}
+          renderItem={_renderItem}
+          keyExtractor={(item) => item.id}
+          scrollEnabled={false}
+          ListHeaderComponent={() => (
+            <View>
+              <FlatList
+                showsHorizontalScrollIndicator={false}
+                horizontal={true}
+                data={oldplans}
+                renderItem={_renderItem}
+                keyExtractor={(item) => item.id}
+              />
+              <Text style={styles.textTitle}>YOUR CREATE PLANS</Text>
+            </View>
+          )}
+        />
 
-export default PlansScreen
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={isModalVisible}
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <View style={styles.box}>
+            <Pressable onPress={() => setModalVisible(false)}>
+              <Text style={styles.closeButton}>X</Text>
+            </Pressable>
+            <Text style={styles.textModalTitle}>{selectedPlan?.title}</Text>
+            <View style={styles.textView}>
+              <Text style={styles.text}>Budget: </Text>
+              <TextInput
+                style={styles.textResult}
+                value={selectedPlan?.budget}
+                editable={true} // Allow editing
+                onChangeText={(newText) => {
+                  if (selectedPlan) {
+                    updatePlanBudget(newText); // Update the plan's budget
+                    setSelectedPlan({ ...selectedPlan, budget: newText }); // Update selected plan locally
+                  }
+                }}
+              />
+              <Ionicons
+                style={styles.editText}
+                name="pencil-outline"
+                size={20}
+                color="white"
+              />
+            </View>
+            <View style={styles.textView}>
+              <Text style={styles.text}>Date on trip: </Text>
+              <Text style={styles.textResult}>{selectedPlan?.date}</Text>
+              <Ionicons
+                style={styles.editText}
+                name="pencil-outline"
+                size={20}
+                color="white"
+              />
+            </View>
+            <Text style={styles.text}>Description:</Text>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.description}
+                value={description}
+                onChangeText={setDescription}
+                multiline
+                numberOfLines={4}
+                textAlignVertical="top"
+              />
+            </View>
+            <Text style={styles.text}>Plan-Id:</Text>
+          </View>
+        </Modal>
+      </ScrollView>
+    </View>
+  );
+};
+
+export default PlansScreen;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#eeeeee',
+    backgroundColor: "#eeeeee",
   },
   header: {
     padding: 10,
-    backgroundColor:'#30777d',
-    alignItems:'center',
-    marginBottom:10,
+    backgroundColor: "#30777d",
+    alignItems: "center",
+    marginBottom: 10,
   },
   textTitle: {
-    fontSize: 20, 
-    fontWeight: 'bold', 
-    color: '#333', 
-    marginVertical: 10,  // เพิ่ม margin ด้านบนและด้านล่าง
-    marginLeft: 20,      // ขยับข้อความไปทางซ้าย
-    textAlign: 'left',   // จัดให้อยู่ทางซ้าย
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#333",
+    marginVertical: 10, // เพิ่ม margin ด้านบนและด้านล่าง
+    marginLeft: 20, // ขยับข้อความไปทางซ้าย
+    textAlign: "left", // จัดให้อยู่ทางซ้าย
   },
-  screenTitle:{
+  screenTitle: {
     marginTop: 50,
     marginBottom: 10,
     color: "#ffffff",
@@ -171,8 +208,8 @@ const styles = StyleSheet.create({
     fontSize: 30,
   },
   textModalTitle: {
-    marginLeft:10,
-    marginBottom:10,
+    marginLeft: 10,
+    marginBottom: 10,
     color: "black",
     fontWeight: "bold",
     textAlign: "left",
@@ -188,61 +225,59 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginVertical: 8,
     paddingHorizontal: 20,
-    backgroundColor: '#ffffff',
+    backgroundColor: "#ffffff",
     borderRadius: 20,
     padding: 15,
     shadowOpacity: 0.25,
-      shadowRadius: 3.84,
-      elevation: 5,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   invitedPlanContainer: {
-    width : 200,
-    height : 140,
+    width: 200,
+    height: 140,
     display: "flex",
     justifyContent: "center",
     marginHorizontal: 5,
     paddingHorizontal: 12,
-    backgroundColor: '#A4E1E7',
+    backgroundColor: "#A4E1E7",
     borderRadius: 20,
     padding: 15,
-    
   },
   planTitle: {
     fontSize: 22,
-    fontWeight: 'bold',
-    color: '#30777d',
+    fontWeight: "bold",
+    color: "#30777d",
   },
   planDetail: {
     fontSize: 16,
-    color: '#333',
+    color: "#333",
     marginTop: 5,
   },
   footer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
     padding: 27,
-    backgroundColor: '#30777d',
+    backgroundColor: "#30777d",
   },
   footerText: {
     fontSize: 16,
-    color: '#333',
+    color: "#333",
   },
   box: {
-  margin: 30,
-  marginTop:20,
-  backgroundColor: "#b8f9ff",
-  borderRadius: 20,
-  padding: 10,
-  shadowColor: "#000",
-  shadowOffset: {
-    width: 0,
-    height: 2,
-  },
-  shadowOpacity: 0.25,
-  shadowRadius: 4,
-  elevation: 5,
-  justifyContent: 'center',
-
+    margin: 30,
+    marginTop: 20,
+    backgroundColor: "#b8f9ff",
+    borderRadius: 20,
+    padding: 10,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    justifyContent: "center",
   },
   text: {
     marginTop: 10,
@@ -263,13 +298,13 @@ const styles = StyleSheet.create({
   },
   editText: {
     marginTop: 12,
-    marginLeft:3,
+    marginLeft: 3,
     color: "#69aeb6",
     fontWeight: "bold",
     textAlign: "left",
   },
-  textView:{
-    flexDirection: 'row',
+  textView: {
+    flexDirection: "row",
   },
   description: {
     marginTop: 3,
@@ -278,29 +313,29 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     fontSize: 15,
     borderRadius: 25,
-    marginLeft:12,
+    marginLeft: 12,
     paddingTop: 30,
-    paddingLeft:10,
+    paddingLeft: 10,
     color: "black",
   },
   icon: {
     marginLeft: 10,
   },
-  closeButton:{
+  closeButton: {
     color: "#a43939",
     fontSize: 16,
     fontWeight: "bold",
     marginLeft: 310,
   },
   budgetContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   inputContainer: {
-    position: 'relative',
+    position: "relative",
   },
   inputIcon: {
-    position: 'absolute',
+    position: "absolute",
     right: 30,
     bottom: 10,
   },

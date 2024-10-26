@@ -41,8 +41,7 @@ const CreatePlansScreen = ({ navigation, route }: any): React.JSX.Element => {
     }
     return planId;
   };
-
-
+  
   // Handle Date Picker change
   const handleDateChange = (event: any, selectedDate?: Date) => {
     if (selectedDate) {
@@ -132,9 +131,6 @@ const CreatePlansScreen = ({ navigation, route }: any): React.JSX.Element => {
         setModalVisible(false);
 
         showAlertModal("Plan created successfully!");
-
-        // Optionally navigate to another screen
-        // navigation.navigate('PlanDetails', { planId: newPlanId });
       } else {
         showAlertModal("Failed to create plan.");
       }

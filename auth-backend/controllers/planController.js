@@ -55,6 +55,15 @@ const getUserPlans = async (req, res) => {
 
     // Method 1: Get plans where user is creator
     const createdPlans = await Plan.find({ creator: userId });
+    // // Method 2: Using the UserPlan relationship (includes shared plans)
+    // const userPlans = await UserPlan.find({ userId })
+    //   .populate({
+    //     path: 'planId',
+    //     model: 'Plan'
+    //   });
+
+    // // Combine and format the results as needed
+    // const plans = userPlans.map(up => up.planId);
 
     const allPlans = [...createdPlans];
 
@@ -113,16 +122,4 @@ const updatePlan = async (req, res) => {
   }
 };
 
-// Get Plans
-const getPlans = async (req, res) => {
-  try {
-    const userId = req.user._id;
-    const plans = await Plan.find({ createdBy: userId });
-
-    res.json({ plans });
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching plans", error });
-  }
-};
-
-module.exports = { createPlan, getAllPlans, getPlanById, updatePlan, getPlans ,getUserPlans};
+module.exports = { createPlan, getAllPlans, getPlanById, updatePlan ,getUserPlans};
