@@ -10,8 +10,6 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { ScrollView } from "react-native-gesture-handler";
-import Createplans from "../components/Createplans";
-import Planid from "../components/Planid";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import {
   useAppSelector,
@@ -24,14 +22,15 @@ const CreatePlansScreen = ({ navigation, route }: any): React.JSX.Element => {
 
   const [planName, setPlanName] = useState("");
   const [budget, setBudget] = useState("");
-  const [dateOnTrip, setDateOnTrip] = useState<Date | null>(null); // Initialize DoB as null
+  const [dateOnTrip, setDateOnTrip] = useState<Date | null>(null);
   const [description, setDescription] = useState("");
   const [planId, setPlanId] = useState("");
-  const [creator, setCreator] = useState("");
 
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedButton, setSelectedButton] = useState("");
-  const [showDatePicker, setShowDatePicker] = useState(false); // Toggle for date pick
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [alertModalVisible, setAlertModalVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
 
   // Utility function to generate a 5-character plan ID
   const generatePlanId = () => {
@@ -43,10 +42,6 @@ const CreatePlansScreen = ({ navigation, route }: any): React.JSX.Element => {
     return planId;
   };
 
-  const toggleModal = (plan: string) => {
-    setSelectedButton(plan);
-    setModalVisible(true);
-  };
 
   // Handle Date Picker change
   const handleDateChange = (event: any, selectedDate?: Date) => {
@@ -79,20 +74,25 @@ const CreatePlansScreen = ({ navigation, route }: any): React.JSX.Element => {
     return `${number.toLocaleString("th-TH")} THB`;
   };
 
+  const showAlertModal = (message: string) => {
+    setAlertMessage(message);
+    setAlertModalVisible(true);
+  };
+
   const handleCreatePlan = async () => {
     // Form validation
     if (!planName.trim()) {
-      Alert.alert("Error", "Please enter a plan name");
+      showAlertModal("Please enter a plan name");
       return;
     }
 
     if (!dateOnTrip) {
-      Alert.alert("Error", "Please select a date for the trip");
+      showAlertModal("Please select a date for the trip");
       return;
     }
 
     if (!budget) {
-      Alert.alert("Error", "Please enter a budget");
+      showAlertModal("Please enter a budget");
       return;
     }
 
@@ -103,7 +103,7 @@ const CreatePlansScreen = ({ navigation, route }: any): React.JSX.Element => {
     const creatorId = profile?._id;
 
     if (!creatorId) {
-      Alert.alert("Error", "User profile not found");
+      showAlertModal("User profile not found");
       return;
     }
 
@@ -131,12 +131,12 @@ const CreatePlansScreen = ({ navigation, route }: any): React.JSX.Element => {
         // Close the modal if it's open
         setModalVisible(false);
 
-        Alert.alert("Success", "Plan created successfully!");
+        showAlertModal("Plan created successfully!");
 
         // Optionally navigate to another screen
         // navigation.navigate('PlanDetails', { planId: newPlanId });
       } else {
-        Alert.alert("Error", "Failed to create plan.");
+        showAlertModal("Failed to create plan.");
       }
     } catch (error: any) {
       if (axios.isAxiosError(error)) {
@@ -144,36 +144,18 @@ const CreatePlansScreen = ({ navigation, route }: any): React.JSX.Element => {
         console.log("Axios error response:", error.response?.data);
         console.log("Axios error status:", error.response?.status);
 
-        if (error.response && error.response.status === 400) {
-          Alert.alert(
-            "Error",
-            "Invalid plan data. Please check your input and try again."
-          );
-        } else {
-          Alert.alert(
-            "Error",
-            `An error occurred while creating the plan: ${
-              error.response?.data?.message || error.message
-            }`
-          );
-        }
+        showAlertModal(
+          error.response?.status === 400
+            ? "Invalid plan data. Please check your input and try again."
+            : `An error occurred while creating the plan: ${
+                error.response?.data?.message || error.message
+              }`
+        );
       } else {
         console.log("Unexpected error:", error);
-        Alert.alert(
-          "Error",
-          "An unexpected error occurred while creating the plan."
-        );
+        showAlertModal("An unexpected error occurred while creating the plan.");
       }
     }
-  };
-
-  const renderComponent = () => {
-    if (selectedButton === "Create") {
-      return <Createplans />;
-    } else if (selectedButton === "Add") {
-      return <Planid />;
-    }
-    return null;
   };
 
   return (
@@ -241,32 +223,30 @@ const CreatePlansScreen = ({ navigation, route }: any): React.JSX.Element => {
           <TouchableOpacity
             style={styles.button}
             onPress={() => {
-              setModalVisible(true), toggleModal("Create"), handleCreatePlan();
+              setModalVisible(true), handleCreatePlan();
             }}
           >
             <Text style={styles.textButton}>Create Plan</Text>
           </TouchableOpacity>
           <Modal
-            animationType="fade"
-            transparent={true}
-            visible={isModalVisible}
-            onRequestClose={() => {
-              setModalVisible(!setModalVisible);
-            }}
-          >
-            <View style={styles.modalView}>
-              {renderComponent()}
-              <View style={styles.buttomView}>
-                <TouchableOpacity
-                  style={styles.touchableOpacityConfirm}
-                  onPress={() => setModalVisible(false)}
-
-                >
-                  <Text style={styles.textButton}>Confirm</Text>
-                </TouchableOpacity>
-              </View>
+          animationType="fade"
+          transparent={true}
+          visible={alertModalVisible}
+          onRequestClose={() => setAlertModalVisible(false)}
+        >
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>{alertMessage}</Text>
+            <View style={styles.buttomView}>
+            <TouchableOpacity
+              style={styles.touchableOpacityConfirm}
+              onPress={() => setAlertModalVisible(false)}
+            >
+              <Text style={styles.textButton}>OK</Text>
+            </TouchableOpacity>
             </View>
-          </Modal>
+          </View>
+        </Modal>
+         
           <Text style={styles.textOr}>
             __________________ OR __________________
           </Text>
@@ -279,7 +259,7 @@ const CreatePlansScreen = ({ navigation, route }: any): React.JSX.Element => {
           <TouchableOpacity
             style={styles.button}
             onPress={() => {
-              setModalVisible(true), toggleModal("Add");
+              setModalVisible(true);
             }}
           >
             <Text style={styles.textButton}>Add ID</Text>
@@ -330,13 +310,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: 370,
   },
-  modalText: {
-    borderRadius: 25,
-    fontWeight: "bold",
-    marginBottom: 15,
-    fontSize: 18,
-    textAlign: "center",
-  },
+  
+  
   closeButton: {
     paddingVertical: 10,
     paddingHorizontal: 20,
@@ -406,6 +381,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#69aeb6",
     borderBottomRightRadius: 20,
+    borderBottomLeftRadius: 20,
   },
   button: {
     borderRadius: 25,
@@ -490,5 +466,12 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginTop: 10,
     marginBottom: 10,
+  },
+  modalText: {
+    borderRadius: 25,
+    fontWeight: "bold",
+    marginBottom: 15,
+    fontSize: 18,
+    textAlign: "center",
   },
 });
