@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-nati
 
 const NotificationScreen = () => {
   const [isEnabled, setIsEnabled] = useState(false);
-  const [tripStates, setTripStates] = useState({});
+  const [tripStates, setTripStates] = useState<Record<string, boolean>>({});
   const [notificationPreference, setNotificationPreference] = useState("all");
 
   const tripNotifications = [
@@ -27,14 +27,14 @@ const NotificationScreen = () => {
     setIsEnabled((prev) => !prev);
   };
 
-  const toggleTripSwitch = (trip) => {
+  const toggleTripSwitch = (trip:any) => {
     setTripStates((prev) => ({
       ...prev,
       [trip]: !prev[trip],
     }));
   };
 
-  const selectNotificationPreference = (preference) => {
+  const selectNotificationPreference = (preference:any) => {
     setNotificationPreference(preference);
   };
 
