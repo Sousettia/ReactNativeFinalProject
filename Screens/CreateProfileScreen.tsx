@@ -8,6 +8,8 @@ import {
   Alert,
   Platform,
   ScrollView,
+  Modal,
+  TouchableOpacity,
 } from "react-native";
 import React, { useState } from "react";
 import * as ImagePicker from "expo-image-picker"; // Import Image Picker
@@ -21,13 +23,19 @@ const CreateProfileScreen = ({ navigation, route }: any): React.JSX.Element => {
   const [gender, setGender] = useState("");
   const [selectedImage, setSelectedImage] = useState<string | null>(null); // State for the selected image
   const [showDatePicker, setShowDatePicker] = useState(false); // Toggle for date pick
+  const [alertModalVisible, setAlertModalVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
 
+  const showAlertModal = (message: string) => {
+    setAlertMessage(message);
+    setAlertModalVisible(true);
+  };
   // Function to handle image picking
   const pickImage = async () => {
     // Ask for permission to access the media library
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
-      Alert.alert("Sorry, we need camera roll permissions to make this work!");
+      showAlertModal("Sorry, we need camera roll permissions to make this work!");
       return;
     }
 
@@ -69,11 +77,11 @@ const CreateProfileScreen = ({ navigation, route }: any): React.JSX.Element => {
         }
       );
       if (response.status === 200) {
-        Alert.alert("Success", "Account created successfully!");
+        showAlertModal("Account created successfully!");
         console.log("Navigating to Login Screen...");
         navigation.navigate("Login")
       } else {
-        Alert.alert("Error", "Failed to create account.");
+        showAlertModal("Failed to create account.");
       }
     } catch (error: any) {
       if (axios.isAxiosError(error)) {
@@ -83,13 +91,11 @@ const CreateProfileScreen = ({ navigation, route }: any): React.JSX.Element => {
         console.log("Axios error status:", error.response?.status);
   
         if (error.response && error.response.status === 400) {
-          Alert.alert(
-            "Error",
+          showAlertModal(
             "User already exists. Please try a different username or email."
           );
         } else {
-          Alert.alert(
-            "Error",
+          showAlertModal(
             `An error occurred during registration: ${
               error.response?.data || error.message
             }`
@@ -97,7 +103,7 @@ const CreateProfileScreen = ({ navigation, route }: any): React.JSX.Element => {
         }
       } else {
         console.log("Unexpected error:", error);
-        Alert.alert("Error", "An unexpected error occurred.");
+        showAlertModal("An unexpected error occurred.");
       }
     }
   };
@@ -181,14 +187,32 @@ const CreateProfileScreen = ({ navigation, route }: any): React.JSX.Element => {
         <Text style={styles.genderText}>Other</Text> */}
       </View>
 
-      <Pressable
+      <TouchableOpacity
         style={[styles.button, styles.buttonOpenConfirm]}
         onPress={() => {
           handleRegister(); // เรียกใช้ฟังก์ชันการเปลี่ยนหน้าจอ
         }}
       >
         <Text style={styles.textStyle}>Confirm</Text>
-      </Pressable>
+      </TouchableOpacity>
+      <Modal
+          animationType="fade"
+          transparent={true}
+          visible={alertModalVisible}
+          onRequestClose={() => setAlertModalVisible(false)}
+        >
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>{alertMessage}</Text>
+            <View style={styles.buttomView}>
+            <TouchableOpacity
+              style={styles.touchableOpacityConfirm}
+              onPress={() => setAlertModalVisible(false)}
+            >
+              <Text style={styles.textButton}>OK</Text>
+            </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
     </ScrollView>
   );
 };
@@ -337,5 +361,47 @@ const styles = StyleSheet.create({
     fontSize: 15, // Font size of the placeholder
     fontWeight: "bold",
     zIndex: 1, // Ensure the placeholder is above the TextInput
+  },
+  touchableOpacityConfirm: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: "center",
+    backgroundColor: "#69aeb6",
+    borderBottomRightRadius: 20,
+    borderBottomLeftRadius: 20,
+  },
+  modalView: {
+    margin: 30,
+    backgroundColor: "white",
+    borderRadius: 20,
+    paddingTop: 30,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    justifyContent: "center",
+    marginTop: 370,
+  },
+  modalText: {
+    borderRadius: 25,
+    fontWeight: "bold",
+    marginBottom: 15,
+    fontSize: 18,
+    textAlign: "center",
+  },
+  buttomView: {
+    width: "100%",
+    flexDirection: "row",
+  },
+  textButton: {
+    borderRadius: 20,
+    color: "#ffffff",
+    fontWeight: "bold",
+    textAlign: "center",
+    fontSize: 20,
   },
 });

@@ -7,6 +7,8 @@ import {
   Pressable,
   Alert,
   ScrollView,
+  Modal,
+  TouchableOpacity,
 } from "react-native";
 import React, { useState } from "react";
 import axios from "axios";
@@ -16,6 +18,8 @@ const CreateAccount2 = ({ navigation, route }: any): React.JSX.Element => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPass, setConfirmPasss] = useState("");
+  const [alertModalVisible, setAlertModalVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
 
   const gotoCreateProfile = () => {
     navigation.navigate("CreateProfile", {
@@ -24,24 +28,28 @@ const CreateAccount2 = ({ navigation, route }: any): React.JSX.Element => {
       password,
     });
   };
+  const showAlertModal = (message: string) => {
+    setAlertMessage(message);
+    setAlertModalVisible(true);
+  };
 
   // Validate user inputs
   const validateInputs = () => {
     if (!username || !email || !password || !confirmPass) {
-      Alert.alert("Error", "Please fill in all the fields.");
+      showAlertModal("Please fill in all the fields.");
       return false;
     }
 
     // Validate email format
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailPattern.test(email)) {
-      Alert.alert("Error", "Invalid email format.");
+      showAlertModal("Invalid email format.");
       return false;
     }
 
     // Check if passwords match
     if (password !== confirmPass) {
-      Alert.alert("Error", "Passwords do not match.");
+      showAlertModal("Passwords do not match.");
       return false;
     }
 
@@ -110,14 +118,32 @@ const CreateAccount2 = ({ navigation, route }: any): React.JSX.Element => {
       {/* เว้นบรรทัด */}
       <Text style={styles.Line}></Text>
 
-      <Pressable
+      <TouchableOpacity
         style={[styles.button, styles.buttonOpenConfirm]}
         onPress={() => {
           handleRegister();
         }}
       >
         <Text style={styles.textStyle}>Confirm</Text>
-      </Pressable>
+      </TouchableOpacity>
+      <Modal
+          animationType="fade"
+          transparent={true}
+          visible={alertModalVisible}
+          onRequestClose={() => setAlertModalVisible(false)}
+        >
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>{alertMessage}</Text>
+            <View style={styles.buttomView}>
+            <TouchableOpacity
+              style={styles.touchableOpacityConfirm}
+              onPress={() => setAlertModalVisible(false)}
+            >
+              <Text style={styles.textButton}>OK</Text>
+            </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
     </ScrollView>
   );
 };
@@ -188,6 +214,48 @@ const styles = StyleSheet.create({
   },
   textStyle: {
     borderRadius: 25,
+    color: "#ffffff",
+    fontWeight: "bold",
+    textAlign: "center",
+    fontSize: 20,
+  },
+  touchableOpacityConfirm: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: "center",
+    backgroundColor: "#69aeb6",
+    borderBottomRightRadius: 20,
+    borderBottomLeftRadius: 20,
+  },
+  modalView: {
+    margin: 30,
+    backgroundColor: "white",
+    borderRadius: 20,
+    paddingTop: 30,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    justifyContent: "center",
+    marginTop: 370,
+  },
+  modalText: {
+    borderRadius: 25,
+    fontWeight: "bold",
+    marginBottom: 15,
+    fontSize: 18,
+    textAlign: "center",
+  },
+  buttomView: {
+    width: "100%",
+    flexDirection: "row",
+  },
+  textButton: {
+    borderRadius: 20,
     color: "#ffffff",
     fontWeight: "bold",
     textAlign: "center",

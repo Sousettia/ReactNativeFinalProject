@@ -6,7 +6,9 @@ import {
   Pressable,
   TextInput,
   Alert,
+  Modal,
   ScrollView,
+  TouchableOpacity,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -31,11 +33,17 @@ const LogInScreen = ({
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [alertModalVisible, setAlertModalVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
   // Use useEffect to log the state when it changes
   useEffect(() => {
     console.log("Login Screen updated isLogin:", isLogin); // This will log when isLogin changes
   }, [isLogin]); // This effect runs whenever isLogin is updated
   
+  const showAlertModal = (message: string) => {
+    setAlertMessage(message);
+    setAlertModalVisible(true);
+  };
   const handleLogin = async () => {
     console.log(username, password);
     try {
@@ -43,17 +51,17 @@ const LogInScreen = ({
 
       if (response.status === 200) {
         console.log(response.data);
-        Alert.alert("Success", "Logged in successfully!");
+        showAlertModal("Logged in successfully!");
         dispatch(setIsLogin(true));
       } else {
-        Alert.alert("Error", "Failed to log in.");
+        showAlertModal("Failed to log in.");
       }
     } catch (error: any) {
       console.error("Login error:", error);
       if (error.response && error.response.status === 400) {
-        Alert.alert("Error", "Invalid username or password.");
+        showAlertModal("Invalid username or password.");
       } else {
-        Alert.alert("Error", "An error occurred during login.");
+        showAlertModal("An error occurred during login.");
       }
     }
   };
@@ -183,14 +191,32 @@ const LogInScreen = ({
         />
       </View>
 
-      <Pressable
+      <TouchableOpacity
         style={[styles.buttonLogin, styles.buttonOpenLogin]}
         onPress={() => {
           handleLogin();
         }}
       >
         <Text style={styles.textStyle}>Login</Text>
-      </Pressable>
+      </TouchableOpacity>
+      <Modal
+          animationType="fade"
+          transparent={true}
+          visible={alertModalVisible}
+          onRequestClose={() => setAlertModalVisible(false)}
+        >
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>{alertMessage}</Text>
+            <View style={styles.buttomView}>
+            <TouchableOpacity
+              style={styles.touchableOpacityConfirm}
+              onPress={() => setAlertModalVisible(false)}
+            >
+              <Text style={styles.textButton}>OK</Text>
+            </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
     </ScrollView>
   );
 };
@@ -294,5 +320,47 @@ const styles = StyleSheet.create({
     alignItems: "center", // Center items vertically
     justifyContent: "flex-start", // Align content to the left
     width: "100%", // Ensure button content takes full width
+  },
+  touchableOpacityConfirm: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: "center",
+    backgroundColor: "#69aeb6",
+    borderBottomRightRadius: 20,
+    borderBottomLeftRadius: 20,
+  },
+  modalView: {
+    margin: 30,
+    backgroundColor: "white",
+    borderRadius: 20,
+    paddingTop: 30,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    justifyContent: "center",
+    marginTop: 370,
+  },
+  modalText: {
+    borderRadius: 25,
+    fontWeight: "bold",
+    marginBottom: 15,
+    fontSize: 18,
+    textAlign: "center",
+  },
+  buttomView: {
+    width: "100%",
+    flexDirection: "row",
+  },
+  textButton: {
+    borderRadius: 20,
+    color: "#ffffff",
+    fontWeight: "bold",
+    textAlign: "center",
+    fontSize: 20,
   },
 });
