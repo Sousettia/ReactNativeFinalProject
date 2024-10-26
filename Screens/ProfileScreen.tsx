@@ -6,88 +6,113 @@ import {
   TextInput,
   Pressable,
   ScrollView,
+  ActivityIndicator,
+  RefreshControl,
 } from "react-native";
-import React, { useState } from "react";
-import icons from "react-native-vector-icons";
+import React, { useEffect, useState, useCallback } from "react";
 import { logout } from "../auth-backend/services/auth-service";
-import { useAppDispatch, useAppSelector } from "../auth-backend/redux-toolkit/hooks";
-import { selectAuthState, setIsLogin } from "../auth-backend/auth/auth-slice";
+import {
+  useAppDispatch,
+  useAppSelector,
+} from "../auth-backend/redux-toolkit/hooks";
+import {
+  selectAuthState,
+  setIsLogin,
+  setProfile,
+  fetchProfile,
+} from "../auth-backend/auth/auth-slice";
+
 const ProfileScreen = (): React.JSX.Element => {
-  
   const dispatch = useAppDispatch();
-  const { isLogin } = useAppSelector(selectAuthState);
-  const { profile } = useAppSelector(selectAuthState);
+  const { isLogin, profile, isLoading } = useAppSelector(selectAuthState);
+  const [refreshing, setRefreshing] = useState(false);
 
+  useEffect(() => {
+    if (isLogin && !profile) {
+      dispatch(fetchProfile());
+    }
+  }, [dispatch, isLogin, profile]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    dispatch(fetchProfile()).finally(() => setRefreshing(false));
+  }, [dispatch]);
+
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+
+  const calculateAge = (dob: Date) => {
+    const diff = Date.now() - dob.getTime();
+    const ageDate = new Date(diff);
+    return Math.abs(ageDate.getUTCFullYear() - 1970).toString();
+  };
   return (
-
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      style={styles.container}
+      showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       <View style={styles.header}>
         <View>
           <Text style={styles.screenTitle}>PROFILE</Text>
-        </View>  
+        </View>
       </View>
       <View style={styles.pad}>
-      <Image
-        source={require("../assets/Image/CreateProfile.png")}
-        resizeMode="contain"
-        style={styles.myImage}
-      />
-      <Text style={styles.textStyle}>Nickname</Text>
-      <TextInput
-        style={styles.input}
-        value={profile?.nickname || ""} // Display nickname from profile
-        editable={false} // Make it non-editable if needed
-        placeholder=" NICKNAME"
-      />
-      <Text style={styles.textStyle}>Gender</Text>
-      <TextInput
-        style={styles.input}
-        value={profile?.gender || ""}
-        editable={false} // Make it non-editable if needed
-        placeholder=" GENDER"
-      />
-
-      <Text style={styles.textStyle}>Age</Text>
-
-      <TextInput
-        style={styles.input}
-        value={profile?.DoB ? calculateAge(new Date(profile.DoB)) : ""}
-        editable={false} // Make it non-editable if needed
-        placeholder=" AGE"
-      />
-
-      <Text style={styles.textStyle}>User-ID</Text>
-
-      <TextInput
-        style={styles.input}
-        value={profile?._id || ""} // Display User-ID from profile
-        editable={false} // Make it non-editable
-        placeholder=" USER-ID"
-      />
-
-      <Pressable
-        style={[styles.button, styles.buttonLogout]}
-        onPress={async () => {
-          await logout();
-          dispatch(setIsLogin(false));
-          console.log("Logout",isLogin) //true
-        }}
-      >
-        <Text style={styles.textLogout}>Log out</Text>
-      </Pressable>
+        <Image
+          source={require("../assets/Image/CreateProfile.png")}
+          resizeMode="contain"
+          style={styles.myImage}
+        />
+        <Text style={styles.textStyle}>Nickname</Text>
+        <TextInput
+          style={styles.input}
+          value={profile?.nickname || ""}
+          editable={false}
+          placeholder="NICKNAME"
+        />
+        <Text style={styles.textStyle}>Gender</Text>
+        <TextInput
+          style={styles.input}
+          value={profile?.gender || ""}
+          editable={false}
+          placeholder="GENDER"
+        />
+        <Text style={styles.textStyle}>Age</Text>
+        <TextInput
+          style={styles.input}
+          value={profile?.DoB ? calculateAge(new Date(profile.DoB)) : ""}
+          editable={false}
+          placeholder="AGE"
+        />
+        <Text style={styles.textStyle}>User-ID</Text>
+        <TextInput
+          style={styles.input}
+          value={profile?._id || ""}
+          editable={false}
+          placeholder="USER-ID"
+        />
+        <Pressable
+          style={[styles.button, styles.buttonLogout]}
+          onPress={async () => {
+            await logout();
+            dispatch(setIsLogin(false));
+          }}
+        >
+          <Text style={styles.textLogout}>Log out</Text>
+        </Pressable>
       </View>
     </ScrollView>
   );
 };
 
 export default ProfileScreen;
-
-// Helper function to calculate age from date of birth
-const calculateAge = (dob: Date) => {
-  const diff = Date.now() - dob.getTime();
-  const ageDate = new Date(diff);
-  return Math.abs(ageDate.getUTCFullYear() - 1970).toString(); // Convert to string for TextInput
-};
 
 const styles = StyleSheet.create({
   container: {
@@ -99,11 +124,11 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: 10,
-    backgroundColor:'#30777d',
-    alignItems:'center',
-    marginBottom:10,
+    backgroundColor: "#30777d",
+    alignItems: "center",
+    marginBottom: 10,
   },
-  screenTitle:{
+  screenTitle: {
     marginTop: 50,
     marginBottom: 10,
     color: "#ffffff",
@@ -111,8 +136,8 @@ const styles = StyleSheet.create({
     textAlign: "left",
     fontSize: 30,
   },
-  pad:{
-    padding:10,
+  pad: {
+    padding: 10,
   },
   icons: {
     fontSize: 25,
@@ -165,7 +190,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#a43939",
     marginTop: 25,
   },
-  
+
   input: {
     color: "black",
     height: 40,
@@ -212,5 +237,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     marginHorizontal: 10, // Added margin to space out text from buttons
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
