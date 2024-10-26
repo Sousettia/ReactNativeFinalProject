@@ -368,13 +368,6 @@ const styles = StyleSheet.create({
     width: "100%",
     flexDirection: "row",
   },
-  touchableOpacityCancel: {
-    flex: 1,
-    paddingVertical: 10,
-    alignItems: "center",
-    backgroundColor: "#c0c0c0",
-    borderBottomLeftRadius: 20,
-  },
   touchableOpacityConfirm: {
     flex: 1,
     paddingVertical: 10,
