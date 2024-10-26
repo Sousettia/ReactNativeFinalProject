@@ -116,7 +116,7 @@ const CreatePlansScreen = ({ navigation, route }: any): React.JSX.Element => {
           dateOnTrip: dateOnTrip.toISOString().split("T")[0], // Format date to YYYY-MM-DD
           budget: parseInt(budget.replace(/[^0-9]/g, "")), // Remove non-numeric chars and convert to number
           description: description.trim(),
-          creator: creatorId,
+          creator: creatorId
         }
       );
 

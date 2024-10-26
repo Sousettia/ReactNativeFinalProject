@@ -19,9 +19,9 @@ const PlanSchema = new mongoose.Schema(
       type: String
     },
     creator: {
-      type: String
-      // type: mongoose.Schema.Types.ObjectId,
-      // ref: "User",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true
     },
     planId: {
       type: String
