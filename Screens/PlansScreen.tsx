@@ -173,7 +173,7 @@ const PlansScreen = () => {
             </Pressable>
             <Text style={styles.textModalTitle}>{selectedPlan?.title}</Text>
             <View style={styles.textView}>
-              <Text style={styles.text}>Budget: </Text>
+              <Text style={styles.text}>Budget : </Text>
               <TextInput
                 style={styles.textResult}
                 value={selectedPlan?.budget.toString()} // Convert to string for display
@@ -198,7 +198,7 @@ const PlansScreen = () => {
               />
             </View>
             <View style={styles.textView}>
-              <Text style={styles.text}>Date on trip: </Text>
+              <Text style={styles.text}>Date on trip : </Text>
               <Text style={styles.textResult}>{selectedPlan?.date}</Text>
               <Ionicons
                 style={styles.editText}
@@ -207,7 +207,7 @@ const PlansScreen = () => {
                 color="white"
               />
             </View>
-            <Text style={styles.text}>Description:</Text>
+            <Text style={styles.text}>Description :</Text>
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.description}
@@ -218,14 +218,14 @@ const PlansScreen = () => {
                 textAlignVertical="top"
               />
             </View>
-            <Text style={styles.text}>Participants:</Text>
+            <Text style={styles.text}>Participants :</Text>
             <View style={styles.friendsContainer}>
               {friends.map((friend, index) => (
                 <View key={index} style={styles.friendItem}>
                   <Text style={styles.friendName}>{friend}</Text>
-                  <TouchableOpacity onPress={() => removeFriend(friend)}>
+                  <Pressable onPress={() => removeFriend(friend)}>
                     <Ionicons name="close-circle" size={20} color="#a43939" />
-                  </TouchableOpacity>
+                  </Pressable>
                 </View>
               ))}
             </View>
@@ -236,12 +236,12 @@ const PlansScreen = () => {
                 value={newFriendName}
                 onChangeText={setNewFriendName}
               />
-              <TouchableOpacity onPress={addFriend} style={styles.addButton}>
+              <Pressable onPress={addFriend} style={styles.addButton}>
                 <Ionicons name="add" size={24} color="white" />
-              </TouchableOpacity>
+              </Pressable>
             </View>
             
-            <Text style={styles.text}>Add Activities</Text>
+            <Text style={styles.text}>Add Activities :</Text>
             {/* Input for Activity Name */}
             <TextInput
               style={styles.input}
@@ -259,29 +259,46 @@ const PlansScreen = () => {
             />
 
             {/* Button to add activity */}
-            <TouchableOpacity onPress={addActivity} style={styles.button}>
+            <Pressable onPress={addActivity} style={styles.button}>
               <Text style={styles.addButtonText}>Add Activities</Text>
-            </TouchableOpacity>
+            </Pressable>
 
             {/* List of activities */}
             <ScrollView style={styles.activityList}>
-              {activityNames.map((activity, index) => (
-                <View key={index} style={styles.activityItem}>
-                  <Text style={styles.activityText}>{activity}</Text>
-                  <Text style={styles.activityCost}>
-                    {activityCosts[index]}
-                  </Text>
-                  <TouchableOpacity onPress={() => removeActivity(index)}>
-                    <Ionicons name="close-circle" size={20} color="#a43939" />
-                  </TouchableOpacity>
-                </View>
-              ))}
+              {activityNames.map((activity, index) => {
+                const totalCost = parseFloat(activityCosts[index]) || 0; // รับค่า cost ต่อ activity
+                const perPersonCost = friends.length > 0 ? (totalCost / friends.length).toFixed(2) : totalCost.toFixed(2); // คำนวณค่าใช้จ่ายต่อคน
+
+                return (
+                  <View key={index} style={styles.activityItem}>
+                    <Pressable onPress={() => removeActivity(index)}>
+                      <Ionicons name="close-circle" size={20} color="#a43939" />
+                    </Pressable>
+                    <Text style={styles.activityText}>{activity}</Text>
+                    <Text style={styles.activityCost}>  Total: {totalCost} | Per Person: {perPersonCost} </Text>
+                    
+                  </View>
+                );
+              })}
             </ScrollView>
 
             <View style={styles.textView}>
               <Text style={styles.text}>Plan-ID : </Text>
               <Text style={styles.textResult}>{selectedPlan?.id}</Text>
             </View>
+            {/* รวมค่าใช้จ่ายทั้งหมดต่อคน */}
+              <View style={styles.textView}>
+                <Text style={styles.text}>Cost per person : </Text>
+                <Text style={styles.textResult}>
+                  {friends.length > 0
+                    ? (
+                        activityCosts.reduce((total, cost) => total + parseFloat(cost || "0"), 0) /
+                        friends.length
+                      ).toFixed(2)
+                    : "0"} {/* คำนวณเฉพาะเมื่อมีเพื่อนอย่างน้อย 1 คน */}
+                  {" "}baht
+                </Text>
+              </View>
             </ScrollView>
           </View>
         </Modal>
