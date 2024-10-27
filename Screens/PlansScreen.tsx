@@ -11,11 +11,14 @@ import {
   Pressable,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { getAllPlans } from "../auth-backend/services/plan-service";
+import { useAppDispatch } from "../auth-backend/redux-toolkit/hooks";
+import { setPlans } from "../auth-backend/auth/plan-slice";
 
 interface oldPlansItem {
   id: string;
   title: string;
-  budget: string;
+  budget: number;
   date: string;
   description: string;
 }
@@ -23,8 +26,15 @@ interface oldPlansItem {
 type RenderItemProps = { item: oldPlansItem };
 
 const PlansScreen = () => {
+  const dispatch = useAppDispatch();
   const [oldplans, setOldPlans] = useState<oldPlansItem[]>([
-    { id: "1", title: "Camp Trip", budget: "3,000 baht", date: "8/16/2025", description: "ค่าน้ำมัน 500 (หาร)" },
+    {
+      id: "1",
+      title: "Camp Trip",
+      budget: 3000,
+      date: "8/16/2025",
+      description: "ค่าน้ำมัน 500 (หาร)",
+    },
   ]);
 
   const [isModalVisible, setModalVisible] = useState(false);
@@ -38,44 +48,73 @@ const PlansScreen = () => {
   const [newActivityCost, setNewActivityCost] = useState("");
 
   // Function to add a new activity
-const addActivity = () => {
-  if (newActivityName.trim() && newActivityCost.trim()) {
-    setActivityNames((prevNames) => [...prevNames, newActivityName]);
-    setActivityCosts((prevCosts) => [...prevCosts, newActivityCost]);
-    setNewActivityName(""); // Clear name input
-    setNewActivityCost(""); // Clear cost input
-  } else {
-    console.log("Activity name and cost cannot be empty.");
-  }
-};
+  const addActivity = () => {
+    if (newActivityName.trim() && newActivityCost.trim()) {
+      setActivityNames((prevNames) => [...prevNames, newActivityName]);
+      setActivityCosts((prevCosts) => [...prevCosts, newActivityCost]);
+      setNewActivityName(""); // Clear name input
+      setNewActivityCost(""); // Clear cost input
+    } else {
+      console.log("Activity name and cost cannot be empty.");
+    }
+  };
 
-// Function to remove an activity
+  // Function to remove an activity
   const removeActivity = (index: number) => {
-    setActivityNames((prevNames) =>
-      prevNames.filter((_, i) => i !== index)
-    );
-    setActivityCosts((prevCosts) =>
-      prevCosts.filter((_, i) => i !== index)
+    setActivityNames((prevNames) => prevNames.filter((_, i) => i !== index));
+    setActivityCosts((prevCosts) => prevCosts.filter((_, i) => i !== index));
+  };
+  const addFriend = () => {
+    if (newFriendName.trim()) {
+      setFriends((prevFriends) => [...prevFriends, newFriendName]);
+      setNewFriendName(""); // Clear the input after adding
+      console.log("Added friend:", newFriendName);
+    } else {
+      console.log("Friend name cannot be empty.");
+    }
+  };
+  // Function to remove a friend from the list
+  const removeFriend = (friendToRemove: string) => {
+    setFriends((prevFriends) =>
+      prevFriends.filter((friend) => friend !== friendToRemove)
     );
   };
-const addFriend = () => {
-  if (newFriendName.trim()) {
-    setFriends((prevFriends) => [...prevFriends, newFriendName]);
-    setNewFriendName(""); // Clear the input after adding
-    console.log("Added friend:", newFriendName);
-  } else {
-    console.log("Friend name cannot be empty.");
-  }
-};
-    // Function to remove a friend from the list
-    const removeFriend = (friendToRemove: string) => {
-      setFriends((prevFriends) => prevFriends.filter(friend => friend !== friendToRemove));
+
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        const response = await getAllPlans();
+        if (response && response.data) {
+          console.log("Fetched plans:", response.data); // Log fetched plans
+
+          // Map the fetched data to match the oldPlansItem interface
+          const newPlans = response.data.map((plan: any) => ({
+            id: plan.planId,
+            title: plan.planName,
+            budget: plan.budget,
+            date: new Date(plan.dateOnTrip).toLocaleDateString("en-GB"),
+            description: plan.description,
+          }));
+          // Replace the old plans with the newly fetched plans
+          setOldPlans(newPlans);
+          dispatch(setPlans(response.data)); // Optional: Set plans in the global state
+        }
+      } catch (error) {
+        console.error("Error fetching plans:", error);
+      }
     };
+
+    fetchPlans(); // Fetch plans on component mount
+  }, [dispatch]);
 
   const updatePlanBudget = (updatedBudget: string) => {
     if (selectedPlan) {
-      const updatedPlans = oldplans.map((plan) =>
-        plan.id === selectedPlan.id ? { ...plan, budget: updatedBudget } : plan
+      const budgetValue = parseFloat(updatedBudget);
+      const validBudget = isNaN(budgetValue) ? 0 : budgetValue; // Set to 0 if NaN
+      const updatedPlans = oldplans.map((oldplan) =>
+        oldplan.id === selectedPlan.id
+          ? { ...oldplan, budget: validBudget } // Use validBudget
+          : oldplan
       );
       setOldPlans(updatedPlans);
     }
@@ -121,7 +160,7 @@ const addFriend = () => {
           )}
         />
 
-      <Modal
+        <Modal
           animationType="slide"
           transparent={true}
           visible={isModalVisible}
@@ -136,15 +175,20 @@ const addFriend = () => {
               <Text style={styles.text}>Budget: </Text>
               <TextInput
                 style={styles.textResult}
-                value={selectedPlan?.budget}
-                editable={true}
+                value={selectedPlan?.budget.toString()} // Convert to string for display
+                editable={true} // Allow editing
                 onChangeText={(newText) => {
                   if (selectedPlan) {
-                    updatePlanBudget(newText);
-                    setSelectedPlan({ ...selectedPlan, budget: newText });
+                    updatePlanBudget(newText); // Update the plan's budget
+                    setSelectedPlan({
+                      ...selectedPlan,
+                      budget: parseFloat(newText) || 0,
+                    }); // Set to 0 if parsing fails
                   }
                 }}
               />
+              <Text style={styles.textResult}> baht</Text>
+              {/* Non-editable suffix */}
               <Ionicons
                 style={styles.editText}
                 name="pencil-outline"
@@ -166,7 +210,7 @@ const addFriend = () => {
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.description}
-                value={description}
+                value={selectedPlan?.description}
                 onChangeText={setDescription}
                 multiline
                 numberOfLines={4}
@@ -206,41 +250,47 @@ const addFriend = () => {
                 </View>
               ))}
             </View>
-                <Text style={styles.text}>Add Activity</Text>
-                {/* Input for Activity Name */}
-                <TextInput
-                  style={styles.input}
-                  placeholder="Enter activity name"
-                  value={newActivityName}
-                  onChangeText={setNewActivityName}
-                />
-                {/* Input for Activity Cost */}
-                <TextInput
-                  style={styles.input}
-                  placeholder="Enter activity cost"
-                  value={newActivityCost}
-                  onChangeText={setNewActivityCost}
-                  keyboardType="numeric"
-                />
+            <Text style={styles.text}>Add Activity</Text>
+            {/* Input for Activity Name */}
+            <TextInput
+              style={styles.input}
+              placeholder="Enter activity name"
+              value={newActivityName}
+              onChangeText={setNewActivityName}
+            />
+            {/* Input for Activity Cost */}
+            <TextInput
+              style={styles.input}
+              placeholder="Enter activity cost"
+              value={newActivityCost}
+              onChangeText={setNewActivityCost}
+              keyboardType="numeric"
+            />
 
-                {/* Button to add activity */}
-                <TouchableOpacity onPress={addActivity} style={styles.button}>
-                  <Text style={styles.addButtonText}>Add Activity</Text>
-                </TouchableOpacity>
+            {/* Button to add activity */}
+            <TouchableOpacity onPress={addActivity} style={styles.button}>
+              <Text style={styles.addButtonText}>Add Activity</Text>
+            </TouchableOpacity>
 
-                {/* List of activities */}
-                <ScrollView style={styles.activityList}>
-                  {activityNames.map((activity, index) => (
-                    <View key={index} style={styles.activityItem}>
-                      <Text style={styles.activityText}>{activity}</Text>
-                      <Text style={styles.activityCost}>{activityCosts[index]}</Text>
-                      <TouchableOpacity onPress={() => removeActivity(index)}>
-                        <Ionicons name="close-circle" size={20} color="#a43939" />
-                      </TouchableOpacity>
-                    </View>
-                  ))}
-                </ScrollView>
+            {/* List of activities */}
+            <ScrollView style={styles.activityList}>
+              {activityNames.map((activity, index) => (
+                <View key={index} style={styles.activityItem}>
+                  <Text style={styles.activityText}>{activity}</Text>
+                  <Text style={styles.activityCost}>
+                    {activityCosts[index]}
+                  </Text>
+                  <TouchableOpacity onPress={() => removeActivity(index)}>
+                    <Ionicons name="close-circle" size={20} color="#a43939" />
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </ScrollView>
 
+            <View style={styles.textView}>
+              <Text style={styles.text}>Plan-ID : </Text>
+              <Text style={styles.textResult}>{selectedPlan?.id}</Text>
+            </View>
           </View>
         </Modal>
       </ScrollView>
@@ -387,7 +437,7 @@ const styles = StyleSheet.create({
     paddingTop: 30,
     paddingLeft: 10,
     color: "black",
-    borderWidth:2,
+    borderWidth: 2,
     borderColor: "#dddddd",
   },
   icon: {
@@ -403,12 +453,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
+  suffix: {
+    marginLeft: 5,
+    fontSize: 20,
+    color: "#69aeb6", // Match the color to your design
+  },
   inputContainer: {
     position: "relative",
   },
   inputFriendContainer: {
-    flexDirection: "row",     // Aligns TextInput and button horizontally
-    alignItems: "center",     // Centers them vertically
+    flexDirection: "row", // Aligns TextInput and button horizontally
+    alignItems: "center", // Centers them vertically
     marginVertical: 10,
     marginLeft: 10,
   },
@@ -417,21 +472,18 @@ const styles = StyleSheet.create({
     right: 30,
     bottom: 10,
   },
-  friendsContainer: 
-  { 
-    flexDirection: "row", 
-    flexWrap: "wrap", 
+  friendsContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
     alignItems: "center",
     marginLeft: 10,
   },
-  friendName: 
-  { 
-    fontSize: 16, 
+  friendName: {
+    fontSize: 16,
     color: "#69aeb6",
-    margin: 5 
+    margin: 5,
   },
-  addButton: 
-  {
+  addButton: {
     width: 30,
     height: 30,
     borderRadius: 15,
@@ -440,12 +492,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   friendInput: {
-    flex: 1,                  // Takes available width
+    flex: 1, // Takes available width
     borderBottomWidth: 1,
     borderBottomColor: "#ccc",
     fontSize: 16,
     paddingHorizontal: 10,
-    marginRight: 10,          // Adds spacing between TextInput and button
+    marginRight: 10, // Adds spacing between TextInput and button
   },
   friendItem: {
     flexDirection: "row",
