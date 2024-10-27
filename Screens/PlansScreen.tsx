@@ -33,7 +33,7 @@ const PlansScreen = () => {
       title: "Camp Trip",
       budget: 3000,
       date: "8/16/2025",
-      description: "ค่าน้ำมัน 500 (หาร)",
+      description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
     },
   ]);
 
@@ -159,7 +159,6 @@ const PlansScreen = () => {
             </View>
           )}
         />
-
         <Modal
           animationType="slide"
           transparent={true}
@@ -167,6 +166,8 @@ const PlansScreen = () => {
           onRequestClose={closeModal}
         >
           <View style={styles.box}>
+            <ScrollView contentContainerStyle={styles.modalContent}
+            showsVerticalScrollIndicator={false}>
             <Pressable onPress={closeModal}>
               <Text style={styles.closeButton}>X</Text>
             </Pressable>
@@ -217,7 +218,7 @@ const PlansScreen = () => {
                 textAlignVertical="top"
               />
             </View>
-            <Text style={styles.text}>Invite Friends:</Text>
+            <Text style={styles.text}>Participants:</Text>
             <View style={styles.friendsContainer}>
               {friends.map((friend, index) => (
                 <View key={index} style={styles.friendItem}>
@@ -239,18 +240,8 @@ const PlansScreen = () => {
                 <Ionicons name="add" size={24} color="white" />
               </TouchableOpacity>
             </View>
-            <View>
-              {activityNames.map((activity, index) => (
-                <View key={index} style={styles.activityItem}>
-                  <Text>{activity}</Text>
-                  <Text>{activityCosts[index]}</Text>
-                  <TouchableOpacity onPress={() => removeActivity(index)}>
-                    <Ionicons name="close-circle" size={20} color="#a43939" />
-                  </TouchableOpacity>
-                </View>
-              ))}
-            </View>
-            <Text style={styles.text}>Add Activity</Text>
+            
+            <Text style={styles.text}>Add Activities</Text>
             {/* Input for Activity Name */}
             <TextInput
               style={styles.input}
@@ -269,7 +260,7 @@ const PlansScreen = () => {
 
             {/* Button to add activity */}
             <TouchableOpacity onPress={addActivity} style={styles.button}>
-              <Text style={styles.addButtonText}>Add Activity</Text>
+              <Text style={styles.addButtonText}>Add Activities</Text>
             </TouchableOpacity>
 
             {/* List of activities */}
@@ -291,6 +282,7 @@ const PlansScreen = () => {
               <Text style={styles.text}>Plan-ID : </Text>
               <Text style={styles.textResult}>{selectedPlan?.id}</Text>
             </View>
+            </ScrollView>
           </View>
         </Modal>
       </ScrollView>
@@ -434,8 +426,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     borderRadius: 25,
     marginLeft: 12,
-    paddingTop: 30,
-    paddingLeft: 10,
+    padding:13,
     color: "black",
     borderWidth: 2,
     borderColor: "#dddddd",
@@ -556,7 +547,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#30777d",
-    marginBottom: 10,
+    
     alignSelf: "center", // Center horizontally
+  },
+  modalContent: {
+    backgroundColor: "#ffffff",
+    borderRadius: 20,
+    width: "100%",
   },
 });
