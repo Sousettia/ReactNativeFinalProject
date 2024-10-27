@@ -58,7 +58,7 @@ return (
     <View style={styles.header}>
       <View style={styles.profileContainer}>
         <Image
-            source={require("../assets/Image/CreateProfile.png")}
+            source={require("../assets/Image/GBProfile.png")}
             resizeMode="contain"
             style={styles.myImage}
           />
@@ -156,6 +156,7 @@ const styles = StyleSheet.create({
     height: 58,   // ลดขนาดความสูง
     marginTop: 10,
     marginBottom: 10,
+    borderRadius: 29, // เพิ่ม borderRadius ครึ่งหนึ่งของขนาดกว้างหรือสูง
   },
   
   profileContainer:{

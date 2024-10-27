@@ -1,102 +1,112 @@
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
   View,
-  Image,
-  SafeAreaView,
-  ScrollView,
-  FlatList,
-  Touchable,
-  Pressable,
+  TouchableOpacity,
   Modal,
   TextInput,
+  FlatList,
+  ScrollView,
+  Pressable,
 } from "react-native";
-import React, { useEffect, useState } from "react";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
-import {
-  useAppDispatch,
-  useAppSelector,
-} from "../auth-backend/redux-toolkit/hooks"; // Assuming you have your typed hooks
-import { selectPlans, setPlans } from "../auth-backend/auth/plan-slice";
-import { getAllPlans } from "../auth-backend/services/plan-service";
 
 interface oldPlansItem {
   id: string;
   title: string;
   budget: string;
   date: string;
+  description: string;
 }
 
 type RenderItemProps = { item: oldPlansItem };
 
 const PlansScreen = () => {
-  const dispatch = useAppDispatch();
-
-  const [oldplans, setoldPlans] = useState<oldPlansItem[]>([]);
+  const [oldplans, setOldPlans] = useState<oldPlansItem[]>([
+    { id: "1", title: "Camp Trip", budget: "3,000 baht", date: "8/16/2025", description: "ค่าน้ำมัน 500 (หาร)" },
+  ]);
 
   const [isModalVisible, setModalVisible] = useState(false);
   const [description, setDescription] = useState("");
   const [selectedPlan, setSelectedPlan] = useState<oldPlansItem | null>(null);
+  const [friends, setFriends] = useState<string[]>([]);
+  const [newFriendName, setNewFriendName] = useState(""); // New state for friend input
+  const [activityNames, setActivityNames] = useState<string[]>([]);
+  const [activityCosts, setActivityCosts] = useState<string[]>([]);
+  const [newActivityName, setNewActivityName] = useState("");
+  const [newActivityCost, setNewActivityCost] = useState("");
 
-  useEffect(() => {
-    const fetchPlans = async () => {
-      try {
-        const response = await getAllPlans();
-        if (response && response.data) {
-          console.log("Fetched plans:", response.data); // Log fetched plans
+  // Function to add a new activity
+const addActivity = () => {
+  if (newActivityName.trim() && newActivityCost.trim()) {
+    setActivityNames((prevNames) => [...prevNames, newActivityName]);
+    setActivityCosts((prevCosts) => [...prevCosts, newActivityCost]);
+    setNewActivityName(""); // Clear name input
+    setNewActivityCost(""); // Clear cost input
+  } else {
+    console.log("Activity name and cost cannot be empty.");
+  }
+};
 
-          // Map the fetched data to match the oldPlansItem interface
-          const newPlans = response.data.map((plan: any) => ({
-            id: plan._id,
-            title: plan.planName,
-            budget: `${plan.budget} baht`,
-            date: new Date(plan.dateOnTrip).toLocaleDateString(), // Convert date to a readable format
-          }));
-
-          // Replace the old plans with the newly fetched plans
-          setoldPlans(newPlans);
-          dispatch(setPlans(response.data)); // Optional: Set plans in the global state
-        }
-      } catch (error) {
-        console.error("Error fetching plans:", error);
-      }
+// Function to remove an activity
+  const removeActivity = (index: number) => {
+    setActivityNames((prevNames) =>
+      prevNames.filter((_, i) => i !== index)
+    );
+    setActivityCosts((prevCosts) =>
+      prevCosts.filter((_, i) => i !== index)
+    );
+  };
+const addFriend = () => {
+  if (newFriendName.trim()) {
+    setFriends((prevFriends) => [...prevFriends, newFriendName]);
+    setNewFriendName(""); // Clear the input after adding
+    console.log("Added friend:", newFriendName);
+  } else {
+    console.log("Friend name cannot be empty.");
+  }
+};
+    // Function to remove a friend from the list
+    const removeFriend = (friendToRemove: string) => {
+      setFriends((prevFriends) => prevFriends.filter(friend => friend !== friendToRemove));
     };
-
-    fetchPlans(); // Fetch plans on component mount
-  }, [dispatch]);
 
   const updatePlanBudget = (updatedBudget: string) => {
     if (selectedPlan) {
-      const updatedPlans = oldplans.map((oldplans) =>
-        oldplans.id === selectedPlan.id
-          ? { ...oldplans, budget: updatedBudget }
-          : oldplans
+      const updatedPlans = oldplans.map((plan) =>
+        plan.id === selectedPlan.id ? { ...plan, budget: updatedBudget } : plan
       );
-      setoldPlans(updatedPlans);
+      setOldPlans(updatedPlans);
     }
   };
 
-  //ฟังก์ชัน _renderItem
+  const openModal = (item: oldPlansItem) => {
+    setSelectedPlan(item);
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setSelectedPlan(null);
+    setDescription("");
+    setModalVisible(false);
+  };
+
   const _renderItem = ({ item }: RenderItemProps) => (
     <TouchableOpacity
       style={styles.planContainer}
-      onPress={() => {
-        setSelectedPlan(item);
-        setModalVisible(true);
-      }}
+      onPress={() => openModal(item)}
     >
       <Text style={styles.planTitle}>{item.title}</Text>
       <Text style={styles.planDetail}>{item.budget}</Text>
       <Text style={styles.planDetail}>{item.date}</Text>
     </TouchableOpacity>
   );
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <View>
-          <Text style={styles.screenTitle}>PLANS</Text>
-        </View>
+        <Text style={styles.screenTitle}>PLANS</Text>
       </View>
       <ScrollView showsVerticalScrollIndicator={false}>
         <FlatList
@@ -106,26 +116,19 @@ const PlansScreen = () => {
           scrollEnabled={false}
           ListHeaderComponent={() => (
             <View>
-              <FlatList
-                showsHorizontalScrollIndicator={false}
-                horizontal={true}
-                data={oldplans}
-                renderItem={_renderItem}
-                keyExtractor={(item) => item.id}
-              />
               <Text style={styles.textTitle}>YOUR CREATE PLANS</Text>
             </View>
           )}
         />
 
-        <Modal
+      <Modal
           animationType="slide"
           transparent={true}
           visible={isModalVisible}
-          onRequestClose={() => setModalVisible(false)}
+          onRequestClose={closeModal}
         >
           <View style={styles.box}>
-            <Pressable onPress={() => setModalVisible(false)}>
+            <Pressable onPress={closeModal}>
               <Text style={styles.closeButton}>X</Text>
             </Pressable>
             <Text style={styles.textModalTitle}>{selectedPlan?.title}</Text>
@@ -134,11 +137,11 @@ const PlansScreen = () => {
               <TextInput
                 style={styles.textResult}
                 value={selectedPlan?.budget}
-                editable={true} // Allow editing
+                editable={true}
                 onChangeText={(newText) => {
                   if (selectedPlan) {
-                    updatePlanBudget(newText); // Update the plan's budget
-                    setSelectedPlan({ ...selectedPlan, budget: newText }); // Update selected plan locally
+                    updatePlanBudget(newText);
+                    setSelectedPlan({ ...selectedPlan, budget: newText });
                   }
                 }}
               />
@@ -170,7 +173,74 @@ const PlansScreen = () => {
                 textAlignVertical="top"
               />
             </View>
-            <Text style={styles.text}>Plan-Id:</Text>
+            <Text style={styles.text}>Invite Friends:</Text>
+            <View style={styles.friendsContainer}>
+              {friends.map((friend, index) => (
+                <View key={index} style={styles.friendItem}>
+                  <Text style={styles.friendName}>{friend}</Text>
+                  <TouchableOpacity onPress={() => removeFriend(friend)}>
+                    <Ionicons name="close-circle" size={20} color="#a43939" />
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+            <View style={styles.inputFriendContainer}>
+              <TextInput
+                style={styles.friendInput}
+                placeholder="Enter friend's name"
+                value={newFriendName}
+                onChangeText={setNewFriendName}
+              />
+              <TouchableOpacity onPress={addFriend} style={styles.addButton}>
+                <Ionicons name="add" size={24} color="white" />
+              </TouchableOpacity>
+            </View>
+            <View>
+              {activityNames.map((activity, index) => (
+                <View key={index} style={styles.activityItem}>
+                  <Text>{activity}</Text>
+                  <Text>{activityCosts[index]}</Text>
+                  <TouchableOpacity onPress={() => removeActivity(index)}>
+                    <Ionicons name="close-circle" size={20} color="#a43939" />
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+                <Text style={styles.text}>Add Activity</Text>
+                {/* Input for Activity Name */}
+                <TextInput
+                  style={styles.input}
+                  placeholder="Enter activity name"
+                  value={newActivityName}
+                  onChangeText={setNewActivityName}
+                />
+                {/* Input for Activity Cost */}
+                <TextInput
+                  style={styles.input}
+                  placeholder="Enter activity cost"
+                  value={newActivityCost}
+                  onChangeText={setNewActivityCost}
+                  keyboardType="numeric"
+                />
+
+                {/* Button to add activity */}
+                <TouchableOpacity onPress={addActivity} style={styles.button}>
+                  <Text style={styles.addButtonText}>Add Activity</Text>
+                </TouchableOpacity>
+
+                {/* List of activities */}
+                <ScrollView style={styles.activityList}>
+                  {activityNames.map((activity, index) => (
+                    <View key={index} style={styles.activityItem}>
+                      <Text style={styles.activityText}>{activity}</Text>
+                      <Text style={styles.activityCost}>{activityCosts[index]}</Text>
+                      <TouchableOpacity onPress={() => removeActivity(index)}>
+                        <Ionicons name="close-circle" size={20} color="#a43939" />
+                      </TouchableOpacity>
+                    </View>
+                  ))}
+                </ScrollView>
+
           </View>
         </Modal>
       </ScrollView>
@@ -266,7 +336,7 @@ const styles = StyleSheet.create({
   box: {
     margin: 30,
     marginTop: 20,
-    backgroundColor: "#b8f9ff",
+    backgroundColor: "#ffffff",
     borderRadius: 20,
     padding: 10,
     shadowColor: "#000",
@@ -317,6 +387,8 @@ const styles = StyleSheet.create({
     paddingTop: 30,
     paddingLeft: 10,
     color: "black",
+    borderWidth:2,
+    borderColor: "#dddddd",
   },
   icon: {
     marginLeft: 10,
@@ -334,9 +406,105 @@ const styles = StyleSheet.create({
   inputContainer: {
     position: "relative",
   },
+  inputFriendContainer: {
+    flexDirection: "row",     // Aligns TextInput and button horizontally
+    alignItems: "center",     // Centers them vertically
+    marginVertical: 10,
+    marginLeft: 10,
+  },
   inputIcon: {
     position: "absolute",
     right: 30,
     bottom: 10,
+  },
+  friendsContainer: 
+  { 
+    flexDirection: "row", 
+    flexWrap: "wrap", 
+    alignItems: "center",
+    marginLeft: 10,
+  },
+  friendName: 
+  { 
+    fontSize: 16, 
+    color: "#69aeb6",
+    margin: 5 
+  },
+  addButton: 
+  {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: "#30777d",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  friendInput: {
+    flex: 1,                  // Takes available width
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+    fontSize: 16,
+    paddingHorizontal: 10,
+    marginRight: 10,          // Adds spacing between TextInput and button
+  },
+  friendItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginRight: 10,
+  },
+  activityList: {
+    marginTop: 20,
+  },
+  activityItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 10,
+    backgroundColor: "#ffffff",
+    borderRadius: 8,
+    marginBottom: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  activityText: {
+    fontSize: 16,
+    color: "#333",
+  },
+  activityCost: {
+    fontSize: 16,
+    color: "#69aeb6",
+  },
+  addButtonText: {
+    color: "white",
+    fontSize: 16,
+    marginLeft: 5,
+  },
+  input: {
+    borderColor: "#ccc",
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 10,
+    fontSize: 16,
+  },
+  activityContainer: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: "#f9f9f9",
+  },
+  button: {
+    borderRadius: 25,
+    paddingVertical: 3,
+    paddingHorizontal: 23,
+    elevation: 1,
+    width: 200,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#30777d",
+    marginBottom: 10,
+    alignSelf: "center", // Center horizontally
   },
 });
