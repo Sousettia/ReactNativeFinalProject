@@ -11,11 +11,10 @@ import {
 import React, { useState } from "react";
 import { ScrollView } from "react-native-gesture-handler";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import {
-  useAppSelector,
-} from "../auth-backend/redux-toolkit/hooks";
+import { useAppSelector } from "../auth-backend/redux-toolkit/hooks";
 import { selectAuthState } from "../auth-backend/auth/auth-slice";
 import axios from "axios";
+import { addPlanToUser } from "../auth-backend/services/userplan-service";
 
 const CreatePlansScreen = ({ navigation, route }: any): React.JSX.Element => {
   const { profile } = useAppSelector(selectAuthState);
@@ -31,7 +30,6 @@ const CreatePlansScreen = ({ navigation, route }: any): React.JSX.Element => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [alertModalVisible, setAlertModalVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
-
   // Utility function to generate a 5-character plan ID
   const generatePlanId = () => {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -41,7 +39,7 @@ const CreatePlansScreen = ({ navigation, route }: any): React.JSX.Element => {
     }
     return planId;
   };
-  
+
   // Handle Date Picker change
   const handleDateChange = (event: any, selectedDate?: Date) => {
     if (selectedDate) {
@@ -108,14 +106,14 @@ const CreatePlansScreen = ({ navigation, route }: any): React.JSX.Element => {
 
     try {
       const response = await axios.post(
-        "http://192.168.1.192:5000/api/plans/create",
+        "http://172.17.8.191:5000/api/plans/create",
         {
           planId: newPlanId,
           planName: planName.trim(),
           dateOnTrip: dateOnTrip.toISOString().split("T")[0], // Format date to YYYY-MM-DD
           budget: parseInt(budget.replace(/[^0-9]/g, "")), // Remove non-numeric chars and convert to number
           description: description.trim(),
-          creator: creatorId
+          creator: creatorId,
         }
       );
 
@@ -153,7 +151,14 @@ const CreatePlansScreen = ({ navigation, route }: any): React.JSX.Element => {
       }
     }
   };
-
+  const handleAddID = async () => {
+    try {
+      await addPlanToUser(profile?._id, planId); // Calls your addPlanToUser service
+      showAlertModal("Plan added to user successfully.");
+    } catch (error) {
+      showAlertModal("Please Input Plan ID");
+    }
+  };
   return (
     <View style={styles.container}>
       <View style={styles.headerContain}>
@@ -162,7 +167,7 @@ const CreatePlansScreen = ({ navigation, route }: any): React.JSX.Element => {
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <Image
-            source={require("../assets/Image/CreateProfile.png")}
+            source={require("../assets/Image/latest.png")}
             resizeMode="contain"
             style={styles.myImage}
           />
@@ -225,24 +230,24 @@ const CreatePlansScreen = ({ navigation, route }: any): React.JSX.Element => {
             <Text style={styles.textButton}>Create Plan</Text>
           </TouchableOpacity>
           <Modal
-          animationType="fade"
-          transparent={true}
-          visible={alertModalVisible}
-          onRequestClose={() => setAlertModalVisible(false)}
-        >
-          <View style={styles.modalView}>
-            <Text style={styles.modalText}>{alertMessage}</Text>
-            <View style={styles.buttomView}>
-            <TouchableOpacity
-              style={styles.touchableOpacityConfirm}
-              onPress={() => setAlertModalVisible(false)}
-            >
-              <Text style={styles.textButton}>OK</Text>
-            </TouchableOpacity>
+            animationType="fade"
+            transparent={true}
+            visible={alertModalVisible}
+            onRequestClose={() => setAlertModalVisible(false)}
+          >
+            <View style={styles.modalView}>
+              <Text style={styles.modalText}>{alertMessage}</Text>
+              <View style={styles.buttomView}>
+                <TouchableOpacity
+                  style={styles.touchableOpacityConfirm}
+                  onPress={() => setAlertModalVisible(false)}
+                >
+                  <Text style={styles.textButton}>OK</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        </Modal>
-         
+          </Modal>
+
           <Text style={styles.textOr}>
             __________________ OR __________________
           </Text>
@@ -256,6 +261,7 @@ const CreatePlansScreen = ({ navigation, route }: any): React.JSX.Element => {
             style={styles.button}
             onPress={() => {
               setModalVisible(true);
+              handleAddID();
             }}
           >
             <Text style={styles.textButton}>Add ID</Text>
@@ -306,8 +312,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: 370,
   },
-  
-  
+
   closeButton: {
     paddingVertical: 10,
     paddingHorizontal: 20,

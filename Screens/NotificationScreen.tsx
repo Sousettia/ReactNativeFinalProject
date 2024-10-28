@@ -1,19 +1,20 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
-
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
+import { useSelector } from "react-redux";
+import { selectPlans } from "../auth-backend/auth/plan-slice";
 const NotificationScreen = () => {
+  const formattedPlans = useSelector(selectPlans) || [];
   const [isEnabled, setIsEnabled] = useState(false);
   const [tripStates, setTripStates] = useState<Record<string, boolean>>({});
   const [notificationPreference, setNotificationPreference] = useState("all");
 
-  const tripNotifications = [
-    "Camp Trip",
-    "Sea Trip",
-    "Japan Trip",
-    "Puket Trip",
-    "Chang Mai Trip",
-    "Chang Rai Trip",
-  ];
+  const tripNotifications = formattedPlans.map((plan) => plan.title);
 
   React.useEffect(() => {
     const initialStates = tripNotifications.reduce(
@@ -27,14 +28,14 @@ const NotificationScreen = () => {
     setIsEnabled((prev) => !prev);
   };
 
-  const toggleTripSwitch = (trip:any) => {
+  const toggleTripSwitch = (trip: any) => {
     setTripStates((prev) => ({
       ...prev,
       [trip]: !prev[trip],
     }));
   };
 
-  const selectNotificationPreference = (preference:any) => {
+  const selectNotificationPreference = (preference: any) => {
     setNotificationPreference(preference);
   };
 
@@ -53,8 +54,12 @@ const NotificationScreen = () => {
             style={[styles.togglerWrapper, isEnabled && styles.togglerActive]}
             onPress={toggleMainSwitch}
           >
-            <View style={[styles.togglerSlider, isEnabled && styles.sliderActive]}>
-              <View style={[styles.togglerKnob, isEnabled && styles.knobActive]} />
+            <View
+              style={[styles.togglerSlider, isEnabled && styles.sliderActive]}
+            >
+              <View
+                style={[styles.togglerKnob, isEnabled && styles.knobActive]}
+              />
             </View>
           </TouchableOpacity>
         </View>
@@ -99,13 +104,24 @@ const NotificationScreen = () => {
                 <View key={index} style={styles.viewSetUp}>
                   <Text style={styles.textSetUp}>{trip}</Text>
                   <TouchableOpacity
-                    style={[styles.togglerWrapper, tripStates[trip] && styles.togglerActive]}
+                    style={[
+                      styles.togglerWrapper,
+                      tripStates[trip] && styles.togglerActive,
+                    ]}
                     onPress={() => toggleTripSwitch(trip)}
                   >
                     <View
-                      style={[styles.togglerSlider, tripStates[trip] && styles.sliderActive]}
+                      style={[
+                        styles.togglerSlider,
+                        tripStates[trip] && styles.sliderActive,
+                      ]}
                     >
-                      <View style={[styles.togglerKnob, tripStates[trip] && styles.knobActive]} />
+                      <View
+                        style={[
+                          styles.togglerKnob,
+                          tripStates[trip] && styles.knobActive,
+                        ]}
+                      />
                     </View>
                   </TouchableOpacity>
                 </View>

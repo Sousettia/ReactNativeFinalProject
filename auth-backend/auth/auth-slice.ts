@@ -57,7 +57,7 @@ export const authSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload as string; // Set the error if fetching fails
       });
-  },
+  }, 
 });
 
 // Export actions

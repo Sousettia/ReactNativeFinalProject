@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import axios from "axios";
-
+import Ionicons from "@expo/vector-icons/Ionicons";
 const CreateAccount2 = ({ navigation, route }: any): React.JSX.Element => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -20,7 +20,8 @@ const CreateAccount2 = ({ navigation, route }: any): React.JSX.Element => {
   const [confirmPass, setConfirmPasss] = useState("");
   const [alertModalVisible, setAlertModalVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
-
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const gotoCreateProfile = () => {
     navigation.navigate("CreateProfile", {
       username,
@@ -97,24 +98,41 @@ const CreateAccount2 = ({ navigation, route }: any): React.JSX.Element => {
       <Text style={styles.Line}></Text>
 
       {/* รหัสผ่าน*/}
-      <TextInput
-        style={styles.input}
-        value={password}
-        onChangeText={setPassword}
-        placeholder="Password"
-      />
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.inputpassword}
+          value={password}
+          onChangeText={setPassword}
+          placeholder="Password"
+          secureTextEntry={!showPassword}
+        />
+        <Ionicons
+          name={showPassword ? "eye" : "eye-off"}
+          onPress={() => setShowPassword(!showPassword)}
+          style={styles.icon}
+          size={20}
+        />
+      </View>
 
       {/* เว้นบรรทัด */}
       <Text style={styles.Line}></Text>
 
       {/* ยืนยันรหัสผ่าน*/}
-      <TextInput
-        style={styles.input}
-        value={confirmPass}
-        onChangeText={setConfirmPasss}
-        placeholder="Confirm-Password"
-      />
-
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.inputpassword}
+          value={confirmPass}
+          onChangeText={setConfirmPasss}
+          placeholder="Confirm-Password"
+          secureTextEntry={!showConfirmPassword}
+        />
+        <Ionicons
+          name={showConfirmPassword ? "eye" : "eye-off"}
+          onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+          style={styles.icon}
+          size={20}
+        />
+      </View>
       {/* เว้นบรรทัด */}
       <Text style={styles.Line}></Text>
 
@@ -127,23 +145,23 @@ const CreateAccount2 = ({ navigation, route }: any): React.JSX.Element => {
         <Text style={styles.textStyle}>Confirm</Text>
       </TouchableOpacity>
       <Modal
-          animationType="fade"
-          transparent={true}
-          visible={alertModalVisible}
-          onRequestClose={() => setAlertModalVisible(false)}
-        >
-          <View style={styles.modalView}>
-            <Text style={styles.modalText}>{alertMessage}</Text>
-            <View style={styles.buttomView}>
+        animationType="fade"
+        transparent={true}
+        visible={alertModalVisible}
+        onRequestClose={() => setAlertModalVisible(false)}
+      >
+        <View style={styles.modalView}>
+          <Text style={styles.modalText}>{alertMessage}</Text>
+          <View style={styles.buttomView}>
             <TouchableOpacity
               style={styles.touchableOpacityConfirm}
               onPress={() => setAlertModalVisible(false)}
             >
               <Text style={styles.textButton}>OK</Text>
             </TouchableOpacity>
-            </View>
           </View>
-        </Modal>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };
@@ -227,6 +245,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 20,
     borderBottomLeftRadius: 20,
   },
+
   modalView: {
     margin: 30,
     backgroundColor: "white",
@@ -260,5 +279,29 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     fontSize: 20,
+  },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginLeft: 50,
+    marginRight: 50,
+    backgroundColor: "#a4e1e7",
+    borderRadius: 25,
+    paddingHorizontal: 15,
+  },
+  inputpassword: {
+    flex: 1,
+    color: "#000000",
+    height: 40,
+    borderRadius: 25,
+    fontSize: 15,
+    fontWeight: "bold",
+    backgroundColor: "#a4e1e7",
+    borderColor: "#a4e1e7",
+    borderWidth: 2,
+  },
+  icon: {
+    padding: 10,
+    color: "#6b8d71",
   },
 });

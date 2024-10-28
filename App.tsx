@@ -245,8 +245,8 @@ const App = (): React.JSX.Element => {
     );
   }
 
-  //return isLogin ? <TabContainer /> : <LoginStackScreen />; //return App
-  return <TabContainer/>
+  return isLogin ? <TabContainer /> : <LoginStackScreen />; //return App
+  //return <TabContainer/>
 };
 const AppWrapper = () => {
   return (

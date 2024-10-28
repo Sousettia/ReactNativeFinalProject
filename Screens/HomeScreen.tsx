@@ -11,72 +11,64 @@ import {
   Modal,
   TextInput,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  selectPlans,
+  selectPlansError,
+  selectPlansLoading,
+} from "../auth-backend/auth/plan-slice";
+import { useAppSelector } from "../auth-backend/redux-toolkit/hooks";
+import { selectAuthState } from "../auth-backend/auth/auth-slice";
 
 interface PlansItem {
   id: string;
   title: string;
   budget: number;
   date: string;
-  image: any;
+  image: number; // Assuming it's always a local image source
   description: string;
 }
 
 type RenderItemProps = { item: PlansItem };
 
 const HomeScreen = () => {
-  const [plans, setPlans] = useState<PlansItem[]>([
-    {
-      id: "1",
-      title: "Camp Trip",
-      budget: 3000,
-      date: "8/16/2025",
-      image: require("../assets/Image/CampTrip.png"),
-      description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-    },
-    {
-      id: "2",
-      title: "Sea Trip",
-      budget: 2000,
-      date: "10/25/2026",
-      image: require("../assets/Image/SeaTrip.png"),
-      description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-    },
-    {
-      id: "3",
-      title: "Chang rai Trip",
-      budget: 8000,
-      date: "12/25/2026",
-      image: require("../assets/Image/ChiangRaiTrip.png"),
-      description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-    },
-    {
-      id: "4",
-      title: "Japan Trip",
-      budget: 8000,
-      date: "2/20/2027",
-      image: require("../assets/Image/JapanTrip.png"),
-      description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-    },
-    {
-      id: "5",
-      title: "Puket Trip",
-      budget: 8000,
-      date: "5/25/2027",
-      image: require("../assets/Image/PuketTrip.png"),
-      description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-    },
-    {
-      id: "6",
-      title: "Chang Mai Trip",
-      budget: 8000,
-      date: "8/16/2028",
-      image: require("../assets/Image/ChiangMaiTrip.png"),
-      description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-    },
-  ]);
+  const formattedPlans = useSelector(selectPlans);
+  const { profile } = useAppSelector(selectAuthState);
+  const images = [
+    require("../assets/Image/CampTrip.png"),
+    require("../assets/Image/SeaTrip.png"),
+    require("../assets/Image/ChiangRaiTrip.png"),
+    require("../assets/Image/JapanTrip.png"),
+    require("../assets/Image/PuketTrip.png"),
+    require("../assets/Image/ChiangMaiTrip.png"),
+    require("../assets/Image/brown-line-friends.png"), // Default image if no specific image is found
+  ];
+
+  const [plans, setPlans] = useState<PlansItem[]>(() => {
+    // Initialize plans only if formattedPlans is available
+    return formattedPlans
+      ? formattedPlans.map((plan, index) => ({
+          ...plan,
+          image: images[index] || images[images.length - 1], // Use the image based on index or default if out of bounds
+        }))
+      : []; // Return an empty array if formattedPlans is null
+  });
+
+  useEffect(() => {
+    if (formattedPlans) {
+      // Check if formattedPlans is not null or undefined
+      setPlans(
+        formattedPlans.map((plan, index) => ({
+          ...plan,
+          image: images[index] || images[images.length - 1], // Use the image based on index or default if out of bounds
+        }))
+      );
+    }
+  }, [formattedPlans]);
+
   const [isModalVisible, setModalVisible] = useState(false);
   const [description, setDescription] = useState("");
   const [selectedPlan, setSelectedPlan] = useState<PlansItem | null>(null);
@@ -86,16 +78,34 @@ const HomeScreen = () => {
   const [activityCosts, setActivityCosts] = useState<string[]>([]);
   const [newActivityName, setNewActivityName] = useState("");
   const [newActivityCost, setNewActivityCost] = useState("");
-
+  const [refreshing, setRefreshing] = useState(false);
   // Function to add a new activity
+  // const addActivity = () => {
+  //   if (newActivityName.trim() && newActivityCost.trim()) {
+  //     setActivityNames((prevNames) => [...prevNames, newActivityName]);
+  //     setActivityCosts((prevCosts) => [...prevCosts, newActivityCost]);
+  //     setNewActivityName(""); // Clear name input
+  //     setNewActivityCost(""); // Clear cost input
+  //   } else {
+  //     console.log("Activity name and cost cannot be empty.");
+  //   }
+  // };
+  const onRefresh = async () => {
+    setRefreshing(true);
+    setTimeout(() => {
+      // Refresh logic, e.g., re-fetch data from API
+      setRefreshing(false);
+    }, 2000); // Simulate a 2-second refresh
+  };
   const addActivity = () => {
-    if (newActivityName.trim() && newActivityCost.trim()) {
+    const cost = parseFloat(newActivityCost);
+    if (newActivityName.trim() && !isNaN(cost) && cost > 0) {
       setActivityNames((prevNames) => [...prevNames, newActivityName]);
-      setActivityCosts((prevCosts) => [...prevCosts, newActivityCost]);
+      setActivityCosts((prevCosts) => [...prevCosts, cost.toString()]);
       setNewActivityName(""); // Clear name input
       setNewActivityCost(""); // Clear cost input
     } else {
-      console.log("Activity name and cost cannot be empty.");
+      console.log("Activity name and cost must be valid.");
     }
   };
 
@@ -130,7 +140,6 @@ const HomeScreen = () => {
     setModalVisible(false);
   };
 
-
   //ฟังก์ชัน _renderItem
   const _renderItem = ({ item }: RenderItemProps) => (
     <TouchableOpacity
@@ -157,7 +166,7 @@ const HomeScreen = () => {
           />
           <View>
             <Text style={styles.textTitle}>Welcome,</Text>
-            <Text style={styles.textUserTitle}>GBcatW</Text>
+            <Text style={styles.textUserTitle}>{profile?.nickname}</Text>
           </View>
         </View>
         {/*Search bar */}
@@ -178,6 +187,8 @@ const HomeScreen = () => {
           renderItem={_renderItem}
           keyExtractor={(item) => item.id}
           showsVerticalScrollIndicator={false}
+          refreshing={refreshing} // Bind the refreshing state
+          onRefresh={onRefresh} // Set the onRefresh function
         />
         <Modal
           animationType="slide"
@@ -186,127 +197,141 @@ const HomeScreen = () => {
           onRequestClose={closeModal}
         >
           <View style={styles.box}>
-            <ScrollView contentContainerStyle={styles.modalContent}
-            showsVerticalScrollIndicator={false}>
-            <Pressable onPress={closeModal}>
-              <Text style={styles.closeButton}>X</Text>
-            </Pressable>
-            <Text style={styles.textModalTitle}>{selectedPlan?.title}</Text>
-            <View style={styles.textView}>
-              <Text style={styles.text}>Budget : </Text>
-              <TextInput
-                style={styles.textResult}
-                value={selectedPlan?.budget.toString()} // Convert to string for display
-                editable={true} // Allow editing
-              />
-              <Text style={styles.textResult}> baht</Text>
-              {/* Non-editable suffix */}
-              <Ionicons
-                style={styles.editText}
-                name="pencil-outline"
-                size={20}
-                color="white"
-              />
-            </View>
-            <View style={styles.textView}>
-              <Text style={styles.text}>Date on trip : </Text>
-              <Text style={styles.textResult}>{selectedPlan?.date}</Text>
-              <Ionicons
-                style={styles.editText}
-                name="pencil-outline"
-                size={20}
-                color="white"
-              />
-            </View>
-            <Text style={styles.text}>Description :</Text>
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.description}
-                value={selectedPlan?.description}
-                onChangeText={setDescription}
-                multiline
-                numberOfLines={4}
-                textAlignVertical="top"
-              />
-            </View>
-            <Text style={styles.text}>Participants :</Text>
-            <View style={styles.friendsContainer}>
-              {friends.map((friend, index) => (
-                <View key={index} style={styles.friendItem}>
-                  <Text style={styles.friendName}>{friend}</Text>
-                  <Pressable onPress={() => removeFriend(friend)}>
-                    <Ionicons name="close-circle" size={20} color="#a43939" />
-                  </Pressable>
-                </View>
-              ))}
-            </View>
-            <View style={styles.inputFriendContainer}>
-              <TextInput
-                style={styles.friendInput}
-                placeholder="Enter friend's name"
-                value={newFriendName}
-                onChangeText={setNewFriendName}
-              />
-              <Pressable onPress={addFriend} style={styles.addButton}>
-                <Ionicons name="add" size={24} color="white" />
+            <ScrollView
+              contentContainerStyle={styles.modalContent}
+              showsVerticalScrollIndicator={false}
+            >
+              <Pressable onPress={closeModal}>
+                <Text style={styles.closeButton}>X</Text>
               </Pressable>
-            </View>
-            
-            <Text style={styles.text}>Add Activities :</Text>
-            {/* Input for Activity Name */}
-            <TextInput
-              style={styles.input}
-              placeholder="Enter activity name"
-              value={newActivityName}
-              onChangeText={setNewActivityName}
-            />
-            {/* Input for Activity Cost */}
-            <TextInput
-              style={styles.input}
-              placeholder="Enter activity cost"
-              value={newActivityCost}
-              onChangeText={setNewActivityCost}
-              keyboardType="numeric"
-            />
-
-            {/* Button to add activity */}
-            <Pressable onPress={addActivity} style={styles.button}>
-              <Text style={styles.addButtonText}>Add Activities</Text>
-            </Pressable>
-
-            {/* List of activities */}
-            <ScrollView style={styles.activityList}>
-              {activityNames.map((activity, index) => {
-                const totalCost = parseFloat(activityCosts[index]) || 0; // รับค่า cost ต่อ activity
-                const perPersonCost = friends.length > 0 ? (totalCost / friends.length).toFixed(2) : totalCost.toFixed(2); // คำนวณค่าใช้จ่ายต่อคน
-
-                return (
-                  <View key={index} style={styles.activityItem}>
-                    <Pressable onPress={() => removeActivity(index)}>
+              <Text style={styles.textModalTitle}>{selectedPlan?.title}</Text>
+              <View style={styles.textView}>
+                <Text style={styles.text}>Budget : </Text>
+                <TextInput
+                  style={styles.textResult}
+                  value={selectedPlan?.budget.toString()} // Convert to string for display
+                  editable={true} // Allow editing
+                />
+                <Text style={styles.textResult}> baht</Text>
+                {/* Non-editable suffix */}
+                <Ionicons
+                  style={styles.editText}
+                  name="pencil-outline"
+                  size={20}
+                  color="white"
+                />
+              </View>
+              <View style={styles.textView}>
+                <Text style={styles.text}>Date on trip : </Text>
+                <Text style={styles.textResult}>{selectedPlan?.date}</Text>
+                <Ionicons
+                  style={styles.editText}
+                  name="pencil-outline"
+                  size={20}
+                  color="white"
+                />
+              </View>
+              <Text style={styles.text}>Description :</Text>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.description}
+                  value={selectedPlan?.description}
+                  onChangeText={setDescription}
+                  multiline
+                  numberOfLines={4}
+                  textAlignVertical="top"
+                />
+              </View>
+              <Text style={styles.text}>Participants :</Text>
+              <View style={styles.friendsContainer}>
+                {friends.map((friend, index) => (
+                  <View key={index} style={styles.friendItem}>
+                    <Text style={styles.friendName}>{friend}</Text>
+                    <Pressable onPress={() => removeFriend(friend)}>
                       <Ionicons name="close-circle" size={20} color="#a43939" />
                     </Pressable>
-                    <Text style={styles.activityText}>{activity}</Text>
-                    <Text style={styles.activityCost}>  Total: {totalCost} | Per Person : {perPersonCost} </Text>
                   </View>
-                );
-              })}
-            </ScrollView>
+                ))}
+              </View>
+              <View style={styles.inputFriendContainer}>
+                <TextInput
+                  style={styles.friendInput}
+                  placeholder="Enter friend's name"
+                  value={newFriendName}
+                  onChangeText={setNewFriendName}
+                />
+                <Pressable onPress={addFriend} style={styles.addButton}>
+                  <Ionicons name="add" size={24} color="white" />
+                </Pressable>
+              </View>
 
-            <View style={styles.textView}>
-              <Text style={styles.text}>Plan-ID : </Text>
-              <Text style={styles.textResult}>{selectedPlan?.id}</Text>
-            </View>
-            {/* รวมค่าใช้จ่ายทั้งหมดต่อคน */}
-            <View style={styles.textView}>
+              <Text style={styles.text}>Add Activities :</Text>
+              {/* Input for Activity Name */}
+              <TextInput
+                style={styles.input}
+                placeholder="Enter activity name"
+                value={newActivityName}
+                onChangeText={setNewActivityName}
+              />
+              {/* Input for Activity Cost */}
+              <TextInput
+                style={styles.input}
+                placeholder="Enter activity cost"
+                value={newActivityCost}
+                onChangeText={setNewActivityCost}
+                keyboardType="numeric"
+              />
+
+              {/* Button to add activity */}
+              <Pressable onPress={addActivity} style={styles.button}>
+                <Text style={styles.addButtonText}>Add Activities</Text>
+              </Pressable>
+
+              {/* List of activities */}
+              <ScrollView style={styles.activityList}>
+                {activityNames.map((activity, index) => {
+                  const totalCost = parseFloat(activityCosts[index]) || 0; // รับค่า cost ต่อ activity
+                  const perPersonCost =
+                    friends.length > 0
+                      ? (totalCost / friends.length).toFixed(2)
+                      : totalCost.toFixed(2); // คำนวณค่าใช้จ่ายต่อคน
+
+                  return (
+                    <View key={index} style={styles.activityItem}>
+                      <Pressable onPress={() => removeActivity(index)}>
+                        <Ionicons
+                          name="close-circle"
+                          size={20}
+                          color="#a43939"
+                        />
+                      </Pressable>
+                      <Text style={styles.activityText}>{activity}</Text>
+                      <Text style={styles.activityCost}>
+                        {" "}
+                        Total: {totalCost} | Per Person : {perPersonCost}{" "}
+                      </Text>
+                    </View>
+                  );
+                })}
+              </ScrollView>
+
+              <View style={styles.textView}>
+                <Text style={styles.text}>Plan-ID : </Text>
+                <Text style={styles.textResult}>{selectedPlan?.id}</Text>
+              </View>
+              {/* รวมค่าใช้จ่ายทั้งหมดต่อคน */}
+              <View style={styles.textView}>
                 <Text style={styles.text}>Cost per person : </Text>
                 <Text style={styles.textResult}>
                   {friends.length > 0
                     ? (
-                        activityCosts.reduce((total, cost) => total + parseFloat(cost || "0"), 0) /
-                        friends.length
+                        activityCosts.reduce(
+                          (total, cost) => total + parseFloat(cost || "0"),
+                          0
+                        ) / friends.length
                       ).toFixed(2)
-                    : "0"} {/* คำนวณเฉพาะเมื่อมีเพื่อนอย่างน้อย 1 คน */}
-                  {" "}baht
+                    : "0"}{" "}
+                  {/* คำนวณเฉพาะเมื่อมีเพื่อนอย่างน้อย 1 คน */} baht
                 </Text>
               </View>
             </ScrollView>
@@ -334,6 +359,17 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 30,
     backgroundColor: "#30777d",
+  },
+  emptyStateContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  emptyStateText: {
+    fontSize: 18,
+    color: "#666",
+    textAlign: "center",
   },
   textInput: {
     padding: 7,
@@ -464,7 +500,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     borderRadius: 25,
     marginLeft: 12,
-    padding:13,
+    padding: 13,
     color: "black",
     borderWidth: 2,
     borderColor: "#dddddd",
@@ -588,7 +624,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#30777d",
-    
+
     alignSelf: "center", // Center horizontally
   },
   modalContent: {
@@ -628,5 +664,4 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "left",
   },
-  
 });

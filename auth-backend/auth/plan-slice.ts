@@ -1,16 +1,14 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "../redux-toolkit/store";
-import axios from "axios";
-
-// Define the Plan interface
+import { getAllPlans } from "../services/plan-service";
+// Define the Plan interface based on the formatted plans structure
 interface Plan {
-  planId: string;
-  planName: string;
+  id: string;
+  title: string;
   budget: number;
-  dateOnTrip: string;
+  date: string;
   description: string;
-  creator: string;
 }
 
 // Define a type for the slice state
@@ -32,10 +30,16 @@ export const fetchPlans = createAsyncThunk(
   "plans/fetchPlans",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        "http://192.168.1.192:5000/api/plans/all-plans"
-      );
-      return response.data; // Assuming the API returns the list of plans
+      const response = await getAllPlans();
+      // Map through the API response to match the formatted structure
+      const formattedPlans = response.data.map((plan: any) => ({
+        id: plan.planId,
+        title: plan.planName,
+        budget: plan.budget,
+        date: new Date(plan.dateOnTrip).toLocaleDateString("en-GB"),
+        description: plan.description,
+      }));
+      return formattedPlans;
     } catch (error: any) {
       // Return a custom error message if something goes wrong
       return rejectWithValue(error.response?.data || "Failed to fetch plans");

@@ -30,15 +30,15 @@ const CreateProfileScreen = ({ navigation, route }: any): React.JSX.Element => {
     setAlertMessage(message);
     setAlertModalVisible(true);
   };
-  // Function to handle image picking
+
   const pickImage = async () => {
     // Ask for permission to access the media library
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== "granted") {
-      showAlertModal("Sorry, we need camera roll permissions to make this work!");
+    if (status !== 'granted') {
+      showAlertModal('Sorry, we need camera roll permissions to make this work!');
       return;
     }
-
+  
     // Open the image picker
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images, // Only images
@@ -46,11 +46,41 @@ const CreateProfileScreen = ({ navigation, route }: any): React.JSX.Element => {
       aspect: [4, 3], // Aspect ratio for cropping (optional)
       quality: 1, // Image quality (1 means highest)
     });
-
+  
     if (!result.canceled) {
-      setSelectedImage(result.assets[0].uri); // Set the image URI if the user picks an image
+      const selectedImageUri = result.assets[0].uri;
+      setSelectedImage(selectedImageUri); // Set the image URI for preview
+  
+      // Create FormData
+      const formData = new FormData();
+  
+      // Append the image to FormData
+      formData.append('image', {
+        uri: selectedImageUri,
+        type: 'image/jpeg', // Change to match your image format if needed
+        name: 'uploaded_image.jpg',
+      } as any); // Use 'as any' to bypass TypeScript type checking (if necessary)
+  
+      try {
+        // Send POST request to the server
+        const response = await fetch('http://192.168.1.192:5000/api/upload', {
+          method: 'POST',
+          body: formData,
+        });
+  
+        const data = await response.json();
+        if (data.imageUrl) {
+          console.log('Image uploaded:', data.imageUrl);
+          // Handle the returned image URL as needed
+        } else {
+          console.log('Upload failed:', data.message);
+        }
+      } catch (error) {
+        console.error('Error uploading image:', error);
+      }
     }
   };
+  
 
   const handleGenderSelect = (selectedGender: string) => {
     setGender(selectedGender);
@@ -66,30 +96,30 @@ const CreateProfileScreen = ({ navigation, route }: any): React.JSX.Element => {
   const handleRegister = async () => {
     try {
       const response = await axios.post(
-        "http://192.168.1.192:5000/api/auth/register",
+        "http://172.17.8.191:5000/api/auth/register",
         {
           username,
           email,
           password,
           nickname,
-          DoB:DoB?.toISOString().split("T")[0], // Format DoB to YYYY-MM-DD
+          DoB: DoB?.toISOString().split("T")[0], // Format DoB to YYYY-MM-DD
           gender,
         }
       );
       if (response.status === 200) {
         showAlertModal("Account created successfully!");
         console.log("Navigating to Login Screen...");
-        navigation.navigate("Login")
+        navigation.navigate("Login");
       } else {
         showAlertModal("Failed to create account.");
       }
     } catch (error: any) {
       if (axios.isAxiosError(error)) {
-        console.log("JWT Secret: ", process.env.JWT_SECRET); 
+        console.log("JWT Secret: ", process.env.JWT_SECRET);
         console.log("Full Axios error object:", error);
         console.log("Axios error response:", error.response?.data);
         console.log("Axios error status:", error.response?.status);
-  
+
         if (error.response && error.response.status === 400) {
           showAlertModal(
             "User already exists. Please try a different username or email."
@@ -134,9 +164,7 @@ const CreateProfileScreen = ({ navigation, route }: any): React.JSX.Element => {
       />
       {/* Date of Birth Picker */}
       <Pressable style={styles.input} onPress={() => setShowDatePicker(true)}>
-      <Text
-          style={DoB ? styles.selectedDate : styles.placeholder}
-        >
+        <Text style={DoB ? styles.selectedDate : styles.placeholder}>
           {DoB ? DoB.toDateString() : "SELECT DATE OF BIRTH"}
         </Text>
       </Pressable>
@@ -196,23 +224,23 @@ const CreateProfileScreen = ({ navigation, route }: any): React.JSX.Element => {
         <Text style={styles.textStyle}>Confirm</Text>
       </TouchableOpacity>
       <Modal
-          animationType="fade"
-          transparent={true}
-          visible={alertModalVisible}
-          onRequestClose={() => setAlertModalVisible(false)}
-        >
-          <View style={styles.modalView}>
-            <Text style={styles.modalText}>{alertMessage}</Text>
-            <View style={styles.buttomView}>
+        animationType="fade"
+        transparent={true}
+        visible={alertModalVisible}
+        onRequestClose={() => setAlertModalVisible(false)}
+      >
+        <View style={styles.modalView}>
+          <Text style={styles.modalText}>{alertMessage}</Text>
+          <View style={styles.buttomView}>
             <TouchableOpacity
               style={styles.touchableOpacityConfirm}
               onPress={() => setAlertModalVisible(false)}
             >
               <Text style={styles.textButton}>OK</Text>
             </TouchableOpacity>
-            </View>
           </View>
-        </Modal>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };
@@ -353,7 +381,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     zIndex: 1, // Ensure the placeholder is above the TextInput
   },
-  selectedDate:{
+  selectedDate: {
     position: "absolute", // Position the placeholder in the input field
     left: 15, // Adjust to where you want the placeholder to appear
     top: "25%", // Vertically center the text

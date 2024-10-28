@@ -39,7 +39,7 @@ const LogInScreen = ({
   useEffect(() => {
     console.log("Login Screen updated isLogin:", isLogin); // This will log when isLogin changes
   }, [isLogin]); // This effect runs whenever isLogin is updated
-  
+
   const showAlertModal = (message: string) => {
     setAlertMessage(message);
     setAlertModalVisible(true);
@@ -48,16 +48,15 @@ const LogInScreen = ({
     console.log(username, password);
     try {
       const response = await login(username, password);
-
+      console.log("Login response:", response);
       if (response.status === 200) {
-        console.log(response.data);
-        showAlertModal("Logged in successfully!");
+        Alert.alert("Success","Logged in successfully!");
         dispatch(setIsLogin(true));
       } else {
         showAlertModal("Failed to log in.");
       }
     } catch (error: any) {
-      console.error("Login error:", error);
+      // console.error("Login error:", error);
       if (error.response && error.response.status === 400) {
         showAlertModal("Invalid username or password.");
       } else {
@@ -200,23 +199,23 @@ const LogInScreen = ({
         <Text style={styles.textStyle}>Login</Text>
       </TouchableOpacity>
       <Modal
-          animationType="fade"
-          transparent={true}
-          visible={alertModalVisible}
-          onRequestClose={() => setAlertModalVisible(false)}
-        >
-          <View style={styles.modalView}>
-            <Text style={styles.modalText}>{alertMessage}</Text>
-            <View style={styles.buttomView}>
+        animationType="fade"
+        transparent={true}
+        visible={alertModalVisible}
+        onRequestClose={() => setAlertModalVisible(false)}
+      >
+        <View style={styles.modalView}>
+          <Text style={styles.modalText}>{alertMessage}</Text>
+          <View style={styles.buttomView}>
             <TouchableOpacity
               style={styles.touchableOpacityConfirm}
               onPress={() => setAlertModalVisible(false)}
             >
               <Text style={styles.textButton}>OK</Text>
             </TouchableOpacity>
-            </View>
           </View>
-        </Modal>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };

@@ -8,6 +8,7 @@ import {
   ScrollView,
   ActivityIndicator,
   RefreshControl,
+  Alert,
 } from "react-native";
 import React, { useEffect, useState, useCallback } from "react";
 import { logout } from "../auth-backend/services/auth-service";
@@ -21,12 +22,24 @@ import {
   setProfile,
   fetchProfile,
 } from "../auth-backend/auth/auth-slice";
+interface UserProfile {
+  _id: string;
+  nickname: string;
+  gender: string;
+  DoB: Date; // or Date if you're storing it as a Date object
+}
 
 const ProfileScreen = (): React.JSX.Element => {
   const dispatch = useAppDispatch();
-  const { isLogin, profile, isLoading } = useAppSelector(selectAuthState);
+  const {
+    isLogin,
+    profile,
+    isLoading,
+  }: { isLogin: boolean; profile: UserProfile | null; isLoading: boolean } =
+    useAppSelector(selectAuthState);
   const [refreshing, setRefreshing] = useState(false);
 
+  // Fetch profile when component mounts or when isLogin changes
   useEffect(() => {
     if (isLogin && !profile) {
       dispatch(fetchProfile());
@@ -35,13 +48,24 @@ const ProfileScreen = (): React.JSX.Element => {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    dispatch(fetchProfile()).finally(() => setRefreshing(false));
+    dispatch(fetchProfile()).finally(() => {
+      setRefreshing(false);
+      // No navigation actions here to prevent going back to HomeScreen
+    });
   }, [dispatch]);
 
   if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text>No profile data available. Please try again later.</Text>
       </View>
     );
   }
@@ -66,7 +90,7 @@ const ProfileScreen = (): React.JSX.Element => {
       </View>
       <View style={styles.pad}>
         <Image
-          source={require("../assets/Image/CreateProfile.png")}
+          source={require("../assets/Image/latest.png")}
           resizeMode="contain"
           style={styles.myImage}
         />
@@ -100,9 +124,18 @@ const ProfileScreen = (): React.JSX.Element => {
         />
         <Pressable
           style={[styles.button, styles.buttonLogout]}
+          // Inside the onPress for the logout button
           onPress={async () => {
-            await logout();
-            dispatch(setIsLogin(false));
+            Alert.alert("Confirm Logout", "Are you sure you want to log out?", [
+              { text: "Cancel", style: "cancel" },
+              {
+                text: "OK",
+                onPress: async () => {
+                  await logout();
+                  dispatch(setIsLogin(false));
+                },
+              },
+            ]);
           }}
         >
           <Text style={styles.textLogout}>Log out</Text>
